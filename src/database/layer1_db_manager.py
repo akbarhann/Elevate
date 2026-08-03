@@ -27,7 +27,13 @@ def raw_string_format(val):
 
 class DatabaseManager:
     def __init__(self):
-        self.engine = create_engine(DB_URL)
+        self.engine = create_engine(
+            DB_URL,
+            pool_size=10,
+            max_overflow=20,
+            pool_recycle=1800,
+            pool_pre_ping=True
+        )
 
     def ingest_shopee(self, df: pd.DataFrame):
         """Ingests Shopee raw data into layer1_raw.raw_shopee with delete-before-insert idempotency."""

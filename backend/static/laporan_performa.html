@@ -4,315 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Performa - SuperFood Elevate</title>
-    <!-- Google Fonts: Outfit & Inter -->
+    <!-- Google Fonts: Inter with Tabular Nums -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        :root {
-            --bg-base: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --bg-card-border: rgba(255, 255, 255, 0.1);
-            --bg-input: rgba(15, 23, 42, 0.6);
-            --primary: #38bdf8;
-            --primary-hover: #0284c7;
-            --accent-green: #34d399;
-            --accent-amber: #fbbf24;
-            --accent-purple: #c084fc;
-            --accent-rose: #fb7185;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(192, 132, 252, 0.12) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 1.5rem;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* Header Navigation */
-        header.dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.75rem;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .brand-section h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #38bdf8 0%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
-        }
-
-        .header-nav-links {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-link-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 0.55rem 1.1rem;
-            border-radius: 0.6rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .nav-link-btn:hover, .nav-link-btn.active {
-            background: var(--primary);
-            color: #0f172a;
-            border-color: var(--primary);
-        }
-
-        /* Filter Controls */
-        .filter-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.5rem;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1.25rem;
-            align-items: end;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .form-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-control {
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.65rem 0.9rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-        }
-
-        select.form-control option {
-            background-color: #1e293b;
-            color: #f8fafc;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-            color: #0f172a;
-            border: none;
-            padding: 0.65rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.4);
-        }
-
-        /* 3 Bar Charts Section */
-        .charts-container-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .chart-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.5rem;
-            box-shadow: var(--shadow-glow);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .chart-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
-        }
-
-        .chart-canvas-box {
-            position: relative;
-            width: 100%;
-            height: 320px;
-        }
-
-        /* Table Card */
-        .table-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .table-header-bar {
-            padding: 1.1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(15, 23, 42, 0.4);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .table-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--accent-amber);
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table.data-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.88rem;
-        }
-
-        table.data-table th {
-            background-color: rgba(30, 41, 59, 0.9);
-            color: var(--text-muted);
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            padding: 0.9rem 1.25rem;
-            border-bottom: 2px solid var(--border-color);
-            white-space: nowrap;
-        }
-
-        table.data-table th.num-col, table.data-table td.num-col {
-            text-align: right;
-        }
-
-        table.data-table td {
-            padding: 0.8rem 1.25rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            white-space: nowrap;
-        }
-
-        table.data-table tr:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-
-        tr.row-grand-total {
-            background-color: rgba(192, 132, 252, 0.15) !important;
-            font-weight: 800;
-            font-size: 0.92rem;
-            border-top: 2px solid var(--accent-purple);
-            border-bottom: 2px solid var(--accent-purple);
-        }
-
-        tr.row-grand-total td {
-            color: #ffffff;
-        }
-
-        /* Loading Spinner */
-        .loading-state {
-            padding: 3rem;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 0.75rem auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="stylesheet" href="/static/style_enterprise.css">
 </head>
 <body>
     <div class="container">
-        <!-- Header Navigation -->
+        <!-- Header Navigation Bar -->
         <header class="dashboard-header">
             <div class="brand-section">
                 <h1>Laporan Performa</h1>
@@ -321,10 +23,10 @@
             <div class="header-nav-links">
                 <a href="/rekap-tagihan-billing" class="nav-link-btn">Rekap Tagihan Billing</a>
                 <a href="/rangkuman" class="nav-link-btn">Rangkuman</a>
-                <a href="/laporan-jam-ramai" class="nav-link-btn">Laporan Jam Ramai</a>
-                <a href="/order-sukses-vs-batal" class="nav-link-btn">Order Sukses vs Batal</a>
                 <a href="/laporan-performa" class="nav-link-btn active">Laporan Performa</a>
                 <a href="/performa-comparison" class="nav-link-btn">Performa Comparison</a>
+                <a href="/laporan-jam-ramai" class="nav-link-btn">Laporan Jam Ramai</a>
+                <a href="/order-sukses-vs-batal" class="nav-link-btn">Order Sukses vs Batal</a>
             </div>
         </header>
 
@@ -387,7 +89,7 @@
         </div>
 
         <!-- 3 Bar Charts Section -->
-        <div class="charts-container-stack">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
             <!-- Bar Chart 1: Pendapatan Kotor -->
             <div class="chart-card">
                 <h2 class="chart-title">Bar Chart: Pendapatan Kotor</h2>
@@ -640,10 +342,10 @@
                         datasets: [{
                             label: 'Pendapatan Kotor',
                             data: kotorData,
-                            backgroundColor: 'rgba(56, 189, 248, 0.8)',
-                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(2, 132, 199, 0.85)',
+                            borderColor: '#0284c7',
                             borderWidth: 1.5,
-                            borderRadius: 6
+                            borderRadius: 4
                         }]
                     },
                     options: {
@@ -654,8 +356,8 @@
                             tooltip: { callbacks: { label: ctx => ` Pendapatan Kotor: ${formatIDR(ctx.raw)}` } }
                         },
                         scales: {
-                            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
-                            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', callback: val => formatYAxisCurrency(val) } }
+                            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: val => formatYAxisCurrency(val) } }
                         }
                     }
                 });
@@ -670,10 +372,10 @@
                         datasets: [{
                             label: 'Pendapatan Bersih',
                             data: bersihData,
-                            backgroundColor: 'rgba(52, 211, 153, 0.8)',
-                            borderColor: '#34d399',
+                            backgroundColor: 'rgba(20, 128, 74, 0.85)',
+                            borderColor: '#14804a',
                             borderWidth: 1.5,
-                            borderRadius: 6
+                            borderRadius: 4
                         }]
                     },
                     options: {
@@ -684,8 +386,8 @@
                             tooltip: { callbacks: { label: ctx => ` Pendapatan Bersih: ${formatIDR(ctx.raw)}` } }
                         },
                         scales: {
-                            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
-                            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', callback: val => formatYAxisCurrency(val) } }
+                            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: val => formatYAxisCurrency(val) } }
                         }
                     }
                 });
@@ -700,10 +402,10 @@
                         datasets: [{
                             label: 'Total Order Sukses',
                             data: suksesData,
-                            backgroundColor: 'rgba(251, 191, 36, 0.8)',
-                            borderColor: '#fbbf24',
+                            backgroundColor: 'rgba(183, 110, 0, 0.85)',
+                            borderColor: '#b76e00',
                             borderWidth: 1.5,
-                            borderRadius: 6
+                            borderRadius: 4
                         }]
                     },
                     options: {
@@ -714,15 +416,15 @@
                             tooltip: { callbacks: { label: ctx => ` Total Order Sukses: ${Number(ctx.raw).toLocaleString('id-ID')} Order` } }
                         },
                         scales: {
-                            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
-                            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', callback: val => val.toLocaleString('id-ID') } }
+                            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: val => val.toLocaleString('id-ID') } }
                         }
                     }
                 });
 
             } catch (err) {
                 console.error('Error loading performa data:', err);
-                tbody.innerHTML = `<tr><td colspan="8" class="loading-state" style="color: #f87171;">Gagal memuat data laporan performa.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="loading-state" style="color: #df1b41;">Gagal memuat data laporan performa.</td></tr>`;
             }
         }
 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperFood Elevate - Enterprise Executive Dashboard</title>
+    <!-- Google Fonts: Inter with Tabular Nums -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style_enterprise.css">
+    <style>
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-5);
+        }
+
+        .report-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .report-card:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .report-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .report-card-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            flex-grow: 1;
+        }
+
+        .report-card-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-subtle);
+            border: 1px solid var(--border-default);
+            color: var(--accent-primary);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .report-card-link:hover {
+            background-color: var(--accent-primary);
+            color: #ffffff;
+            border-color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Navigation Bar -->
+        <header class="dashboard-header">
+            <div class="brand-section">
+                <h1>SuperFood Elevate</h1>
+            </div>
+
+            <div class="header-nav-links">
+                <a href="/dashboard" class="nav-link-btn active">Dashboard Utama</a>
+                <a href="/rekap-tagihan-billing" class="nav-link-btn">Rekap Tagihan Billing</a>
+                <a href="/rangkuman" class="nav-link-btn">Rangkuman</a>
+                <a href="/laporan-performa" class="nav-link-btn">Laporan Performa</a>
+                <a href="/performa-comparison" class="nav-link-btn">Performa Comparison</a>
+                <a href="/laporan-jam-ramai" class="nav-link-btn">Laporan Jam Ramai</a>
+                <a href="/order-sukses-vs-batal" class="nav-link-btn">Order Sukses vs Batal</a>
+            </div>
+        </header>
+
+        <!-- Executive Hero KPI Grid -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Total Pendapatan Kotor</div>
+                <div class="kpi-value" id="kpiGrossRevenue">Rp 1,27 M</div>
+                <div class="kpi-subtext">Q2 2026 (April - Juni)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Potongan Ojol</div>
+                <div class="kpi-value" id="kpiOjolFees" style="color: var(--semantic-negative);">Rp 624,9 Jt</div>
+                <div class="kpi-subtext">Komisi platform & potongan promo</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Pendapatan Bersih</div>
+                <div class="kpi-value" id="kpiNetRevenue" style="color: var(--semantic-positive);">Rp 1,51 M</div>
+                <div class="kpi-subtext">Omset bersih diterima</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Transaksi Order</div>
+                <div class="kpi-value" id="kpiTotalOrders">67.850</div>
+                <div class="kpi-subtext">67.207 Sukses (99,05%)</div>
+            </div>
+        </div>
+
+        <!-- Master Report Hub Grid -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">Pusat Modul Laporan & Analitik</h2>
+
+            <div class="report-grid">
+                <!-- 1. Rekap Tagihan Billing -->
+                <div class="report-card">
+                    <div class="report-card-title">Rekap Tagihan Billing</div>
+                    <div class="report-card-desc">Rekapitulasi tagihan billing mingguan & bulanan per owner, perhitungan revenue share, serta pembaruan status pembayaran.</div>
+                    <a href="/rekap-tagihan-billing" class="report-card-link">Buka Laporan Tagihan</a>
+                </div>
+
+                <!-- 2. Rangkuman Performa Ojol -->
+                <div class="report-card">
+                    <div class="report-card-title">Rangkuman Performa Ojol</div>
+                    <div class="report-card-desc">Rangkuman eksekutif performa platform ojol (GoFood, GrabFood, ShopeeFood) beserta rincian bulanan per channel.</div>
+                    <a href="/rangkuman" class="report-card-link">Buka Rangkuman Ojol</a>
+                </div>
+
+                <!-- 3. Laporan Performa -->
+                <div class="report-card">
+                    <div class="report-card-title">Laporan Performa</div>
+                    <div class="report-card-desc">Laporan tren performa keuangan dan operasional dengan pilihan granularitas waktu Harian, Mingguan, dan Bulanan.</div>
+                    <a href="/laporan-performa" class="report-card-link">Buka Laporan Performa</a>
+                </div>
+
+                <!-- 4. Performa Comparison -->
+                <div class="report-card">
+                    <div class="report-card-title">Performa Comparison</div>
+                    <div class="report-card-desc">Analisis komparatif Grouped Bar Chart untuk perbandingan Keuangan (Kotor, Potongan, Bersih) dan Order (Total, Sukses, Batal).</div>
+                    <a href="/performa-comparison" class="report-card-link">Buka Performa Comparison</a>
+                </div>
+
+                <!-- 5. Laporan Jam Ramai -->
+                <div class="report-card">
+                    <div class="report-card-title">Laporan Jam Ramai</div>
+                    <div class="report-card-desc">Analisis jam sibuk/ramai (Hourly Distribution 00:00 - 23:00) dan Matriks Heatmap Intensitas Order 24 Jam x 7 Hari.</div>
+                    <a href="/laporan-jam-ramai" class="report-card-link">Buka Laporan Jam Ramai</a>
+                </div>
+
+                <!-- 6. Order Sukses vs Batal -->
+                <div class="report-card">
+                    <div class="report-card-title">Order Sukses vs Order Batal</div>
+                    <div class="report-card-desc">Visualisasi rasio persentase order sukses vs batal per channel (All OFD, GrabFood, ShopeeFood) dan tabel rincian status.</div>
+                    <a href="/order-sukses-vs-batal" class="report-card-link">Buka Status Order</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -170,9 +170,9 @@ BEGIN
         gmv_vs_revenue = CASE WHEN net_sales <> 0 THEN ROUND((revenue / net_sales * 100), 2) || '%' ELSE '0%' END
     WHERE updated_at >= (CURRENT_TIMESTAMP - INTERVAL '1 hour');
 
-    -- 5. AUTO REFRESH MATERIALIZED VIEWS REKAP TAGIHAN HARIAN & BULANAN
-    IF EXISTS (SELECT 1 FROM pg_matviews WHERE schemaname = 'layer3_dim' AND matviewname = 'mv_rekap_tagihan_daily') THEN
-        REFRESH MATERIALIZED VIEW CONCURRENTLY layer3_dim.mv_rekap_tagihan_daily;
+    -- 5. AUTO REFRESH MATERIALIZED VIEW HARIAN
+    IF EXISTS (SELECT 1 FROM pg_matviews WHERE schemaname = 'layer3_dim' AND matviewname = 'mv_payment_daily') THEN
+        REFRESH MATERIALIZED VIEW CONCURRENTLY layer3_dim.mv_payment_daily;
     END IF;
 
     IF EXISTS (SELECT 1 FROM pg_matviews WHERE schemaname = 'layer3_dim' AND matviewname = 'mv_rekap_tagihan_monthly') THEN

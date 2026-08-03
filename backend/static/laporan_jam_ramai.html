@@ -3,234 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bar Chart Jam Ramai - SuperFood Elevate</title>
-    <!-- Google Fonts: Outfit & Inter -->
+    <title>Laporan Jam Ramai - SuperFood Elevate</title>
+    <!-- Google Fonts: Inter with Tabular Nums -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <link rel="stylesheet" href="/static/style_enterprise.css">
     <style>
-        :root {
-            --bg-base: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --bg-card-border: rgba(255, 255, 255, 0.1);
-            --bg-input: rgba(15, 23, 42, 0.6);
-            --primary: #38bdf8;
-            --primary-hover: #0284c7;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(192, 132, 252, 0.12) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 1.5rem;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* Header Navigation */
-        header.dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.75rem;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .brand-section h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #38bdf8 0%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
-        }
-
-        .header-nav-links {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .nav-link-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 0.55rem 1.1rem;
-            border-radius: 0.6rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .nav-link-btn:hover, .nav-link-btn.active {
-            background: var(--primary);
-            color: #0f172a;
-            border-color: var(--primary);
-        }
-
-        /* Filter Card */
-        .filter-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.5rem;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .filter-grid {
+        .heatmap-matrix {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.25rem;
-            align-items: end;
+            grid-template-columns: 80px repeat(24, 1fr);
+            gap: 2px;
+            background-color: var(--border-default);
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            padding: 1px;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .form-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-control {
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.65rem 0.9rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-        }
-
-        select.form-control option {
-            background-color: #1e293b;
-            color: #f8fafc;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-            color: #0f172a;
-            border: none;
-            padding: 0.65rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.4);
-        }
-
-        /* Chart Card */
-        .chart-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-glow);
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .chart-header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.9rem;
-        }
-
-        .chart-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 450px;
-        }
-
-        /* Loading Spinner */
-        .loading-state {
-            padding: 3rem;
+        .heatmap-cell {
+            background-color: var(--bg-surface);
+            padding: var(--space-2) var(--space-1);
             text-align: center;
-            color: var(--text-muted);
-            font-size: 0.95rem;
+            font-size: 0.75rem;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-secondary);
         }
 
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 0.75rem auto;
+        .heatmap-cell-header {
+            font-weight: 600;
+            background-color: var(--bg-subtle);
+            color: var(--text-primary);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .heatmap-cell-val {
+            transition: background-color 0.15s ease;
         }
+
+        .heat-level-0 { background-color: rgba(15, 23, 42, 0.9); color: var(--text-tertiary); }
+        .heat-level-1 { background-color: rgba(2, 132, 199, 0.2); color: #7dd3fc; }
+        .heat-level-2 { background-color: rgba(2, 132, 199, 0.4); color: #f8fafc; }
+        .heat-level-3 { background-color: rgba(2, 132, 199, 0.65); color: #ffffff; font-weight: 600; }
+        .heat-level-4 { background-color: rgba(2, 132, 199, 0.9); color: #ffffff; font-weight: 700; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header Navigation -->
+        <!-- Header Navigation Bar -->
         <header class="dashboard-header">
             <div class="brand-section">
                 <h1>Laporan Jam Ramai</h1>
@@ -238,12 +58,15 @@
 
             <div class="header-nav-links">
                 <a href="/rekap-tagihan-billing" class="nav-link-btn">Rekap Tagihan Billing</a>
-                <a href="/laporan-aplikasi-ojol" class="nav-link-btn">Laporan Aplikasi Ojol</a>
+                <a href="/rangkuman" class="nav-link-btn">Rangkuman</a>
+                <a href="/laporan-performa" class="nav-link-btn">Laporan Performa</a>
+                <a href="/performa-comparison" class="nav-link-btn">Performa Comparison</a>
                 <a href="/laporan-jam-ramai" class="nav-link-btn active">Laporan Jam Ramai</a>
+                <a href="/order-sukses-vs-batal" class="nav-link-btn">Order Sukses vs Batal</a>
             </div>
         </header>
 
-        <!-- Filter Controls Form -->
+        <!-- Filter Controls Card -->
         <div class="filter-card">
             <form id="filterForm" onsubmit="handleFilterSubmit(event)">
                 <div class="filter-grid">
@@ -265,32 +88,46 @@
 
                     <!-- Filter Date Range: Dari -->
                     <div class="form-group">
-                        <label for="startDateInput" class="form-label">Dari</label>
+                        <label for="startDateInput" class="form-label">Dari Tanggal</label>
                         <input type="date" id="startDateInput" class="form-control" value="2026-04-01">
                     </div>
 
                     <!-- Filter Date Range: Hingga -->
                     <div class="form-group">
-                        <label for="endDateInput" class="form-label">Hingga</label>
+                        <label for="endDateInput" class="form-label">Hingga Tanggal</label>
                         <input type="date" id="endDateInput" class="form-control" value="2026-06-30">
                     </div>
 
                     <!-- Submit Button -->
                     <div class="form-group">
-                        <button type="submit" class="btn-submit">Tampilkan Laporan</button>
+                        <button type="submit" class="btn-submit">Tampilkan Jam Ramai</button>
                     </div>
                 </div>
             </form>
         </div>
 
-        <!-- Bar Chart Card -->
-        <div class="chart-card">
-            <div class="chart-header-bar">
-                <h2 class="chart-title">Bar Chart: Jam Ramai</h2>
+        <!-- Visualizations Stack -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Bar Chart 1: Distribution Order per Jam (00:00 - 23:00) -->
+            <div class="chart-card">
+                <h2 class="chart-title">Distribus Order per Jam (00:00 - 23:00)</h2>
+                <div class="chart-canvas-box">
+                    <canvas id="chartJamRamai"></canvas>
+                </div>
             </div>
-            
-            <div class="chart-container">
-                <canvas id="jamRamaiChart"></canvas>
+
+            <!-- Heatmap Matrix Card: 24 Jam x 7 Hari -->
+            <div class="table-card" style="padding: 1.25rem;">
+                <div class="table-header-bar" style="border: none; padding: 0 0 1rem 0; background: transparent;">
+                    <h2 class="table-title">Matriks Intensitas Order (24 Jam x 7 Hari)</h2>
+                </div>
+                
+                <div id="heatmapContainer">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        Memuat matriks intensitas jam ramai...
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -298,7 +135,6 @@
     <script>
         const API_BASE = window.location.origin;
         let chartInstance = null;
-
         let filterMapping = [];
 
         // Initialize Filters & Cascading Handlers
@@ -352,100 +188,111 @@
             });
         }
 
-        // Fetch & Render Bar Chart: Jam Ramai
-        async function renderChart(params) {
+        // Fetch & Render Bar Chart + Heatmap
+        async function loadJamRamaiData(params) {
             try {
-                const url = new URL(`${API_BASE}/api/laporan-jam-ramai/summary`);
-                Object.keys(params).forEach(k => { if (params[k]) url.searchParams.append(k, params[k]); });
+                // Fetch Hourly Summary
+                const urlSummary = new URL(`${API_BASE}/api/laporan-jam-ramai/summary`);
+                Object.keys(params).forEach(k => { if (params[k]) urlSummary.searchParams.append(k, params[k]); });
 
-                const res = await fetch(url);
-                const json = await res.json();
+                const resSummary = await fetch(urlSummary);
+                const jsonSummary = await resSummary.json();
 
-                if (json.status !== 'success' || !json.data || json.data.length === 0) {
-                    return;
-                }
+                if (jsonSummary.status === 'success' && jsonSummary.data) {
+                    const hours = jsonSummary.data.map(d => d.jam_label);
+                    const orders = jsonSummary.data.map(d => d.total_order);
 
-                // Exclude Grand Total (jam 99)
-                const hourlyData = json.data.filter(r => r.jam !== 99);
-
-                const labels = hourlyData.map(r => `${String(r.jam).padStart(2, '0')}:00`);
-                const orderData = hourlyData.map(r => r.order_sukses);
-                
-                // Find Max Volume for Bar Highlight Color
-                const maxOrders = Math.max(...orderData);
-
-                const bgColors = orderData.map(val => val === maxOrders && val > 0 ? '#fbbf24' : 'rgba(56, 189, 248, 0.7)');
-                const borderColors = orderData.map(val => val === maxOrders && val > 0 ? '#f59e0b' : '#38bdf8');
-
-                const ctx = document.getElementById('jamRamaiChart').getContext('2d');
-
-                if (chartInstance) {
-                    chartInstance.destroy();
-                }
-
-                chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Jumlah Order Sukses',
-                            data: orderData,
-                            backgroundColor: bgColors,
-                            borderColor: borderColors,
-                            borderWidth: 1.5,
-                            borderRadius: 6,
-                            hoverBackgroundColor: 'rgba(56, 189, 248, 0.9)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                labels: {
-                                    color: '#94a3b8',
-                                    font: { family: 'Inter', size: 12, weight: 600 }
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                titleColor: '#f8fafc',
-                                bodyColor: '#38bdf8',
-                                borderColor: 'rgba(255, 255, 255, 0.1)',
-                                borderWidth: 1,
-                                padding: 12,
-                                callbacks: {
-                                    label: function(context) {
-                                        const raw = context.raw || 0;
-                                        const isPeak = raw === maxOrders;
-                                        return ` Order Sukses: ${raw.toLocaleString('id-ID')} ${isPeak ? '(Jam Teramai)' : ''}`;
-                                    }
-                                }
-                            }
+                    const ctx = document.getElementById('chartJamRamai').getContext('2d');
+                    if (chartInstance) chartInstance.destroy();
+                    chartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: hours,
+                            datasets: [{
+                                label: 'Total Order',
+                                data: orders,
+                                backgroundColor: 'rgba(2, 132, 199, 0.85)',
+                                borderColor: '#0284c7',
+                                borderWidth: 1.5,
+                                borderRadius: 4
+                            }]
                         },
-                        scales: {
-                            x: {
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 12, weight: 600 } } },
+                                tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('id-ID')} Order` } }
                             },
-                            y: {
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: {
-                                    color: '#94a3b8',
-                                    font: { family: 'Inter', size: 11 },
-                                    callback: function(val) { return val.toLocaleString('id-ID'); }
-                                }
+                            scales: {
+                                x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                                y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: val => val.toLocaleString('id-ID') } }
                             }
                         }
-                    }
-                });
+                    });
+                }
+
+                // Fetch 24x7 Heatmap Matrix
+                const urlMatrix = new URL(`${API_BASE}/api/laporan-jam-ramai/by-day`);
+                Object.keys(params).forEach(k => { if (params[k]) urlMatrix.searchParams.append(k, params[k]); });
+
+                const resMatrix = await fetch(urlMatrix);
+                const jsonMatrix = await resMatrix.json();
+
+                if (jsonMatrix.status === 'success' && jsonMatrix.matrix) {
+                    renderHeatmap(jsonMatrix.matrix);
+                }
+
             } catch (err) {
-                console.error('Error rendering chart:', err);
+                console.error('Error loading jam ramai data:', err);
             }
         }
 
-        // Handle Filter Form Submit
+        // Render 24x7 Matrix Heatmap
+        function renderHeatmap(matrix) {
+            const container = document.getElementById('heatmapContainer');
+            const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+            
+            // Find max value for heat scaling
+            let maxVal = 1;
+            days.forEach(d => {
+                for (let h = 0; h < 24; h++) {
+                    const val = (matrix[d] && matrix[d][h]) || 0;
+                    if (val > maxVal) maxVal = val;
+                }
+            });
+
+            let html = '<div class="heatmap-matrix">';
+            
+            // Header Row: Blank + 00:00 to 23:00
+            html += '<div class="heatmap-cell heatmap-cell-header">Hari / Jam</div>';
+            for (let h = 0; h < 24; h++) {
+                const hourStr = String(h).padStart(2, '0');
+                html += `<div class="heatmap-cell heatmap-cell-header">${hourStr}</div>`;
+            }
+
+            // Data Rows: Each Day
+            days.forEach(d => {
+                html += `<div class="heatmap-cell heatmap-cell-header">${d}</div>`;
+                for (let h = 0; h < 24; h++) {
+                    const val = (matrix[d] && matrix[d][h]) || 0;
+                    let heatLevel = 0;
+                    if (val > 0) {
+                        const ratio = val / maxVal;
+                        if (ratio > 0.75) heatLevel = 4;
+                        else if (ratio > 0.50) heatLevel = 3;
+                        else if (ratio > 0.25) heatLevel = 2;
+                        else heatLevel = 1;
+                    }
+                    html += `<div class="heatmap-cell heatmap-cell-val heat-level-${heatLevel}" title="${d} Jam ${h}:00 - ${val.toLocaleString('id-ID')} Order">${val > 0 ? val : '-'}</div>`;
+                }
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Handle Filter Submit
         function handleFilterSubmit(e) {
             e.preventDefault();
             const params = {
@@ -455,7 +302,7 @@
                 end_date: document.getElementById('endDateInput').value
             };
 
-            renderChart(params);
+            loadJamRamaiData(params);
         }
 
         // Initial Load
@@ -469,7 +316,7 @@
                 end_date: '2026-06-30'
             };
 
-            renderChart(initialParams);
+            loadJamRamaiData(initialParams);
         });
     </script>
 </body>

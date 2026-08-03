@@ -3,572 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Rekap Tagihan - SuperFood Elevate</title>
-    <!-- Google Fonts -->
+    <title>Rekap Tagihan Billing - SuperFood Elevate</title>
+    <!-- Google Fonts: Inter with Tabular Nums -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style_enterprise.css">
     <style>
-        :root {
-            --bg-base: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --bg-card-border: rgba(255, 255, 255, 0.08);
-            --bg-input: #1e293b;
-            --primary: #38bdf8;
-            --primary-hover: #0284c7;
-            --accent-green: #34d399;
-            --accent-amber: #fbbf24;
-            --accent-red: #f87171;
-            --accent-purple: #c084fc;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(192, 132, 252, 0.1) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 2rem 1.5rem;
-        }
-
-        .container {
-            max-width: 1560px;
-            margin: 0 auto;
-        }
-
-        /* Top Header Navigation */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .brand-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: -0.02em;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        /* Segmented Mode Switcher (Bulanan vs Mingguan) */
         .tab-switcher {
-            display: flex;
-            background: #1e293b;
-            padding: 0.3rem;
-            border-radius: 0.6rem;
-            border: 1px solid var(--border-color);
+            display: inline-flex;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: 3px;
         }
 
         .tab-btn {
-            padding: 0.6rem 1.25rem;
-            border: none;
             background: transparent;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.9rem;
-            border-radius: 0.4rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: #0f172a;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
-        }
-
-        .btn-sync {
-            background: rgba(52, 211, 153, 0.15);
-            color: var(--accent-green);
-            border: 1px solid rgba(52, 211, 153, 0.4);
-            padding: 0.6rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-sync:hover {
-            background: var(--accent-green);
-            color: #0f172a;
-        }
-
-        /* Controls Panel (Filter Glassmorphism Card) */
-        .filter-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.25rem;
-            align-items: end;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .form-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-control {
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.65rem 0.9rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-        }
-
-        select.form-control option {
-            background-color: #1e293b;
-            color: #f8fafc;
-        }
-
-        .btn-submit {
-            background-color: var(--primary);
-            color: #0f172a;
-            font-weight: 700;
             border: none;
-            padding: 0.7rem 1.5rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-family: 'Outfit', sans-serif;
-            transition: background-color 0.15s ease, transform 0.15s ease;
-        }
-
-        .btn-submit:hover {
-            background-color: var(--primary-hover);
-            color: #ffffff;
-            transform: translateY(-1px);
-        }
-
-        /* KPI Cards Summary */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .kpi-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 0.85rem;
-            padding: 1.1rem 1.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .kpi-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--card-accent, var(--primary));
-        }
-
-        .kpi-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .kpi-value {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        /* Table Card Container */
-        .table-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: var(--shadow-glow);
-            margin-bottom: 2rem;
-        }
-
-        .table-header-bar {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .table-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 600;
-        }
-
-        .table-search-box {
-            width: 340px;
-            max-width: 100%;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
+            color: var(--text-secondary);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-sm);
             font-size: 0.85rem;
-        }
-
-        th {
-            background-color: rgba(15, 23, 42, 0.6);
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            padding: 0.8rem 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 0.75rem 0.75rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            color: var(--text-main);
-            white-space: nowrap;
-        }
-
-        tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-
-        /* Grand Total Row Highlight */
-        tr.row-grand-total {
-            background-color: rgba(56, 189, 248, 0.1) !important;
-            font-weight: 700;
-            border-top: 2px solid var(--primary);
-            border-bottom: 2px solid var(--primary);
-        }
-
-        tr.row-grand-total td {
-            color: #ffffff;
-            font-size: 0.9rem;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        /* Status Badges */
-        .badge-status-lunas {
-            background: rgba(52, 211, 153, 0.15);
-            color: var(--accent-green);
-            border: 1px solid rgba(52, 211, 153, 0.4);
-            padding: 0.25rem 0.7rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-        }
-
-        .badge-status-lunas:hover {
-            transform: scale(1.05);
-        }
-
-        .badge-status-belum-dibayar {
-            background: rgba(248, 113, 113, 0.15);
-            color: var(--accent-red);
-            border: 1px solid rgba(248, 113, 113, 0.4);
-            padding: 0.25rem 0.7rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-        }
-
-        .badge-status-belum-dibayar:hover {
-            transform: scale(1.05);
-        }
-
-        .badge-status-pending {
-            background: rgba(192, 132, 252, 0.15);
-            color: var(--accent-purple);
-            border: 1px solid rgba(192, 132, 252, 0.4);
-            padding: 0.25rem 0.7rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-        }
-
-        .badge-status-pending:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-action {
-            background: rgba(56, 189, 248, 0.15);
-            color: var(--primary);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            padding: 0.35rem 0.75rem;
-            border-radius: 0.4rem;
-            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.15s ease;
         }
 
-        .btn-action:hover {
-            background: var(--primary);
-            color: #0f172a;
+        .tab-btn.active {
+            background-color: var(--accent-primary);
+            color: #ffffff;
         }
 
-        /* Modal Backdrop & Edit Form Card */
+        .search-box {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-default);
+            color: var(--text-primary);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            width: 280px;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: var(--border-focus);
+        }
+
+        /* Modal Styles */
         .modal-backdrop {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(6px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
             z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
         }
-
-        .modal-backdrop.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
         .modal-card {
-            background: #1e293b;
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            width: 100%;
-            max-width: 540px;
-            padding: 1.75rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
-        }
-
-        .modal-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            border-top: 1px solid var(--border-color);
-            padding-top: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .btn-cancel {
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 0.6rem 1.2rem;
-            border-radius: 0.4rem;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .btn-cancel:hover {
-            color: var(--text-main);
-            border-color: var(--text-muted);
-        }
-
-        .state-container {
-            padding: 3rem;
-            text-align: center;
-            color: var(--text-muted);
-        }
-
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: var(--primary);
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .text-center {
-            text-align: center;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            width: 480px; max-width: 90%;
+            box-shadow: var(--shadow-elevated);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header & Pill Tab Switcher -->
-        <header>
-            <div>
-                <h1 class="brand-title">Laporan Rekap Tagihan Rekonsiliasi</h1>
-            </div>
+        <!-- Header Navigation Bar & Segmented Pill Switcher -->
+        <header class="dashboard-header" style="flex-direction: column; align-items: stretch; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div class="brand-section">
+                    <h1>Rekap Tagihan Billing</h1>
+                </div>
 
-            <div class="header-actions">
-                <!-- Segmented Pill Switcher -->
                 <div class="tab-switcher">
                     <button type="button" class="tab-btn active" id="btnTabWeekly" onclick="switchMode('Weekly')">Tagihan Mingguan (Weekly)</button>
                     <button type="button" class="tab-btn" id="btnTabMonthly" onclick="switchMode('Monthly')">Tagihan Bulanan (Monthly)</button>
                 </div>
             </div>
+
+            <!-- Header Nav Links -->
+            <div class="header-nav-links" style="border-top: 1px solid var(--border-default); padding-top: 0.75rem;">
+                <a href="/rekap-tagihan-billing" class="nav-link-btn active">Rekap Tagihan Billing</a>
+                <a href="/rangkuman" class="nav-link-btn">Rangkuman</a>
+                <a href="/laporan-performa" class="nav-link-btn">Laporan Performa</a>
+                <a href="/performa-comparison" class="nav-link-btn">Performa Comparison</a>
+                <a href="/laporan-jam-ramai" class="nav-link-btn">Laporan Jam Ramai</a>
+                <a href="/order-sukses-vs-batal" class="nav-link-btn">Order Sukses vs Batal</a>
+            </div>
         </header>
 
-        <!-- Filter Controls Form matching Google Sheet Header 1:1 -->
+        <!-- Hero Metric KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Total Pendapatan Kotor</div>
+                <div class="kpi-value" id="kpiGross">Rp 0</div>
+                <div class="kpi-subtext">Omset bruto terpilih</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Potongan Ojol</div>
+                <div class="kpi-value" id="kpiCommission">Rp 0</div>
+                <div class="kpi-subtext">Potongan komisi & promo</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Pendapatan Bersih</div>
+                <div class="kpi-value" id="kpiNet">Rp 0</div>
+                <div class="kpi-subtext">Omset bersih diterima</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Tagihan SuperFood</div>
+                <div class="kpi-value" id="kpiBill" style="color: var(--accent-primary);">Rp 0</div>
+                <div class="kpi-subtext">Billing layanan SuperFood</div>
+            </div>
+        </div>
+
+        <!-- Filter Controls Card -->
         <div class="filter-card">
             <form id="filterForm" onsubmit="handleFilterSubmit(event)">
-                <input type="hidden" id="cycleSelect" value="Weekly">
-
                 <div class="filter-grid">
-                    <!-- Tahun Dropdown -->
+                    <!-- Filter Periode -->
                     <div class="form-group">
-                        <label for="tahunSelect" class="form-label">Tahun</label>
-                        <select id="tahunSelect" class="form-control" onchange="handleYearMonthChange()">
-                            <option value="2026" selected>2026</option>
-                            <option value="2025">2025</option>
+                        <label for="periodeSelect" class="form-label" id="labelPeriodeSelect">PILIH MINGGU (PERIODE)</label>
+                        <select id="periodeSelect" class="form-control">
+                            <option value="">Memuat periode...</option>
                         </select>
                     </div>
 
-                    <!-- Bulan Dropdown (Includes historic March & April) -->
+                    <!-- Filter Owner -->
                     <div class="form-group">
-                        <label for="bulanSelect" class="form-label">Bulan</label>
-                        <select id="bulanSelect" class="form-control" onchange="handleYearMonthChange()">
-                            <option value="01">Januari</option>
-                            <option value="02">Februari</option>
-                            <option value="03">Maret (Histori)</option>
-                            <option value="04">April (Histori)</option>
-                            <option value="05">Mei (Histori)</option>
-                            <option value="06" selected>Juni</option>
-                            <option value="07">Juli</option>
-                            <option value="08">Agustus</option>
-                            <option value="09">September</option>
-                            <option value="10">Oktober</option>
-                            <option value="11">November</option>
-                            <option value="12">Desember</option>
+                        <label for="ownerSelect" class="form-label">FILTER OWNER</label>
+                        <select id="ownerSelect" class="form-control">
+                            <option value="">Semua Owner</option>
                         </select>
                     </div>
 
-                    <!-- Minggu Dropdown (Weekly Mode Only) -->
-                    <div class="form-group" id="mingguGroup">
-                        <label for="mingguSelect" class="form-label" style="color: var(--accent-amber);">Minggu</label>
-                        <select id="mingguSelect" class="form-control" onchange="handleWeekChange()" style="border-color: var(--accent-amber);">
-                            <option value="W1" selected>Week 1</option>
-                            <option value="W2">Week 2</option>
-                            <option value="W3">Week 3</option>
-                            <option value="W4">Week 4</option>
-                            <option value="W5">Week 5</option>
-                        </select>
-                    </div>
-
-                    <!-- Tanggal Tagihan Header (Calculated Issue Date Badge - Calendar Disabled) -->
+                    <!-- Search Box -->
                     <div class="form-group">
-                        <label for="headerTanggalTagihan" class="form-label" style="color: var(--primary);">Tanggal Tagihan Diterbitkan</label>
-                        <input type="text" id="headerTanggalTagihan" class="form-control" value="2026-06-08" readonly disabled style="opacity: 0.9; border-color: var(--primary); font-weight: 700; background-color: rgba(56, 189, 248, 0.1); cursor: not-allowed;" title="Tagihan transaksi Senin - Minggu diterbitkan pada hari Senin berikutnya">
-                    </div>
-
-                    <!-- Status Pembayaran Filter Dropdown -->
-                    <div class="form-group">
-                        <label for="statusSelect" class="form-label">Status Pembayaran</label>
-                        <select id="statusSelect" class="form-control">
-                            <option value="">Semua Status</option>
-                            <option value="LUNAS">LUNAS</option>
-                            <option value="BELUM DIBAYAR">BELUM DIBAYAR</option>
-                            <option value="PENDING">PENDING</option>
-                        </select>
+                        <label for="searchInput" class="form-label">CARI OWNER</label>
+                        <input type="text" id="searchInput" class="search-box" placeholder="Ketik nama owner..." oninput="handleSearchInput(this.value)">
                     </div>
 
                     <!-- Submit Button -->
@@ -579,64 +153,33 @@
             </form>
         </div>
 
-        <!-- Summary KPI Cards -->
-        <div class="kpi-grid">
-            <div class="kpi-card" style="--card-accent: #38bdf8;">
-                <span class="kpi-title">Subtotal Tagihan</span>
-                <span class="kpi-value" id="kpiSubtotal">Rp 0</span>
-            </div>
-            <div class="kpi-card" style="--card-accent: #34d399;">
-                <span class="kpi-title">Total Tagihan Final</span>
-                <span class="kpi-value" id="kpiTotal">Rp 0</span>
-            </div>
-            <div class="kpi-card" style="--card-accent: #c084fc;">
-                <span class="kpi-title">Total Order Sukses</span>
-                <span class="kpi-value" id="kpiSukses">0 Order</span>
-            </div>
-            <div class="kpi-card" style="--card-accent: #818cf8;">
-                <span class="kpi-title">Status Pembayaran</span>
-                <span class="kpi-value" id="kpiPaidStatus">0 Lunas / 0 Belum Dibayar</span>
-            </div>
-        </div>
-
-        <!-- Main Clean Data Table Container matching Google Sheet Layout 1:1 -->
+        <!-- Table Card: Billing Summary Data Table -->
         <div class="table-card">
             <div class="table-header-bar">
-                <h2 class="table-title" id="tableHeaderTitle">Daftar Tagihan Outlet Live (Weekly Cycle)</h2>
-                
-                <!-- Quick Search Input for High Efficiency -->
-                <div class="table-search-box">
-                    <input type="text" id="tableSearchInput" class="form-control" 
-                           placeholder="Cari outlet, cabang, brand..." oninput="handleTableSearch()">
-                </div>
-                
-                <span id="recordCountBadge" style="font-size: 0.85rem; color: var(--text-muted);">0 Outlet</span>
+                <h2 class="table-title" id="tableTitleText">Data Rekap Tagihan Billing (Weekly)</h2>
             </div>
-
-            <div class="table-wrapper">
-                <table id="monthlyTable">
+            
+            <div class="table-responsive">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Outlet</th>
-                            <th>Cabang</th>
-                            <th>Periode</th>
-                            <th class="text-center">Jumlah Order Sukses</th>
-                            <th class="text-right">Biaya</th>
-                            <th class="text-right">Subtotal Tagihan</th>
-                            <th class="text-right">Penyesuaian</th>
-                            <th class="text-right">Total Tagihan</th>
-                            <th>Tanggal Tagihan</th>
-                            <th>Transfer ID</th>
-                            <th>Tanggal Pembayaran</th>
-                            <th>Link Bukti Pembayaran</th>
-                            <th class="text-center">Status Pembayaran</th>
-                            <th class="text-center">Aksi</th>
+                            <th>NO</th>
+                            <th>NAMA OWNER</th>
+                            <th>PERIODE</th>
+                            <th class="num-col">PENDAPATAN KOTOR</th>
+                            <th class="num-col">POTONGAN OJOL</th>
+                            <th class="num-col">PENDAPATAN BERSIH</th>
+                            <th class="num-col">BAGI HASIL (%)</th>
+                            <th class="num-col">TAGIHAN SUPERFOOD</th>
+                            <th class="text-center">STATUS PEMBAYARAN</th>
+                            <th class="text-center">AKSI</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody">
+                    <tbody id="billingTableBody">
                         <tr>
-                            <td colspan="14" class="state-container">
-                                Silakan pilih filter dan klik <strong>Tampilkan Tagihan</strong>.
+                            <td colspan="10" class="loading-state">
+                                <div class="spinner"></div>
+                                Memuat data tagihan billing...
                             </td>
                         </tr>
                     </tbody>
@@ -645,459 +188,256 @@
         </div>
     </div>
 
-    <!-- Edit Administrative Payment Input Modal Form -->
-    <div class="modal-backdrop" id="editModal">
+    <!-- Payment Status Edit Modal -->
+    <div id="editModal" class="modal-backdrop" style="display: none;">
         <div class="modal-card">
-            <div class="modal-header">
-                <h3 class="modal-title">Input / Edit Pembayaran Tagihan</h3>
+            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Update Status Pembayaran</h3>
+            <p id="modalOwnerText" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;"></p>
+            
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label">Status Pembayaran</label>
+                <select id="modalStatusSelect" class="form-control">
+                    <option value="Unpaid">Unpaid (Belum Lunas)</option>
+                    <option value="Paid">Paid (Lunas)</option>
+                    <option value="Pending">Pending (Dalam Proses)</option>
+                </select>
             </div>
-            <form id="editForm" onsubmit="handleSavePayment(event)">
-                <input type="hidden" id="editStoreId">
-                <input type="hidden" id="editPeriode">
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                    <div class="form-group">
-                        <label class="form-label">Store ID</label>
-                        <input type="text" id="displayStoreId" class="form-control" readonly style="opacity: 0.7;">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Periode</label>
-                        <input type="text" id="displayPeriode" class="form-control" readonly style="opacity: 0.7;">
-                    </div>
-                </div>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label">Catatan / No. Referensi</label>
+                <input type="text" id="modalNotesInput" class="form-control" placeholder="Contoh: Transfer Bank BCA BCA-8832">
+            </div>
 
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label">Penyesuaian Biaya (Rp)</label>
-                    <input type="number" id="editPenyesuaian" class="form-control" placeholder="0" step="1000">
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                    <div class="form-group">
-                        <label class="form-label">Tanggal Tagihan</label>
-                        <input type="date" id="editTanggalTagihan" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Transfer ID</label>
-                        <input type="text" id="editTransferId" class="form-control" placeholder="Contoh: TRF-99201">
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                    <div class="form-group">
-                        <label class="form-label">Tanggal Pembayaran</label>
-                        <input type="date" id="editTanggalPembayaran" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Status Pembayaran</label>
-                        <select id="editStatusPembayaran" class="form-control" required>
-                            <option value="LUNAS">LUNAS</option>
-                            <option value="BELUM DIBAYAR">BELUM DIBAYAR</option>
-                            <option value="PENDING">PENDING</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label">Link Bukti Pembayaran</label>
-                    <input type="url" id="editLinkBukti" class="form-control" placeholder="https://drive.google.com/...">
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-cancel" onclick="closeEditModal()">Batal</button>
-                    <button type="submit" class="btn-submit">Simpan Pembayaran</button>
-                </div>
-            </form>
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <button type="button" class="btn-submit" style="background: transparent; border-color: var(--border-default); color: var(--text-secondary);" onclick="closeEditModal()">Batal</button>
+                <button type="button" class="btn-submit" onclick="savePaymentStatus()">Simpan</button>
+            </div>
         </div>
     </div>
 
-    <!-- Frontend Script -->
     <script>
         const API_BASE = window.location.origin;
+        let currentMode = 'Weekly'; // 'Weekly' or 'Monthly'
+        let currentData = [];
+        let activeRecordId = null;
 
-        // Cached Intl.NumberFormat instance for O(1) performance
-        const idrFormatter = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            maximumFractionDigits: 0
-        });
-
-        function formatIDR(value) {
-            return idrFormatter.format(value || 0);
+        // Format IDR Currency
+        function formatIDR(val) {
+            if (val === null || val === undefined || isNaN(val)) return 'Rp 0';
+            const num = Math.round(Number(val));
+            const formatted = Math.abs(num).toLocaleString('id-ID');
+            return num < 0 ? `-Rp ${formatted}` : `Rp ${formatted}`;
         }
 
-        let rawMonthlyData = [];
-
+        // Switch between Weekly & Monthly modes
         function switchMode(mode) {
-            document.getElementById('cycleSelect').value = mode;
-
-            const btnWeekly = document.getElementById('btnTabWeekly');
-            const btnMonthly = document.getElementById('btnTabMonthly');
-            const mingguGroup = document.getElementById('mingguGroup');
-            const titleEl = document.getElementById('tableHeaderTitle');
-
-            if (mode === 'Weekly') {
-                btnWeekly.classList.add('active');
-                btnMonthly.classList.remove('active');
-                mingguGroup.style.display = 'flex';
-                titleEl.textContent = 'Daftar Tagihan Outlet Live (Weekly Cycle)';
-            } else {
-                btnMonthly.classList.add('active');
-                btnWeekly.classList.remove('active');
-                mingguGroup.style.display = 'none';
-                titleEl.textContent = 'Daftar Tagihan Outlet Live (Monthly Cycle)';
-            }
-
-            handleYearMonthChange();
-            fetchMonthlyData();
-        }
-
-        function handleYearMonthChange() {
-            const cycle = document.getElementById('cycleSelect').value;
-            const y = document.getElementById('tahunSelect').value;
-            const m = document.getElementById('bulanSelect').value;
-
-            if (cycle === 'Monthly') {
-                if (y && m) {
-                    const nextMonth = parseInt(m) === 12 ? 1 : parseInt(m) + 1;
-                    const nextYear = parseInt(m) === 12 ? parseInt(y) + 1 : parseInt(y);
-                    const monthStr = nextMonth < 10 ? `0${nextMonth}` : `${nextMonth}`;
-                    document.getElementById('headerTanggalTagihan').value = `${nextYear}-${monthStr}-01`;
-                }
-            } else {
-                handleWeekChange();
-            }
-        }
-
-        function handleWeekChange() {
-            const y = parseInt(document.getElementById('tahunSelect').value || '2026');
-            const m = parseInt(document.getElementById('bulanSelect').value || '06');
-            const w = document.getElementById('mingguSelect').value || 'W1';
+            currentMode = mode;
+            document.getElementById('btnTabWeekly').classList.toggle('active', mode === 'Weekly');
+            document.getElementById('btnTabMonthly').classList.toggle('active', mode === 'Monthly');
             
-            let resYear = y;
-            let resMonth = m;
-            let day = 8;
-
-            if (w === 'W1') day = 8;
-            else if (w === 'W2') day = 15;
-            else if (w === 'W3') day = 22;
-            else if (w === 'W4') day = 29;
-            else if (w === 'W5') {
-                resMonth = m === 12 ? 1 : m + 1;
-                resYear = m === 12 ? y + 1 : y;
-                day = 6;
-            }
-
-            const monthStr = resMonth < 10 ? `0${resMonth}` : `${resMonth}`;
-            const dayStr = day < 10 ? `0${day}` : `${day}`;
-            document.getElementById('headerTanggalTagihan').value = `${resYear}-${monthStr}-${dayStr}`;
+            document.getElementById('labelPeriodeSelect').textContent = mode === 'Weekly' ? 'PILIH MINGGU (PERIODE)' : 'PILIH BULAN (PERIODE)';
+            document.getElementById('tableTitleText').textContent = `Data Rekap Tagihan Billing (${mode})`;
+            
+            loadPeriodeOptions();
         }
 
-        // Trigger Sync History from Google Sheets
-        async function handleSyncHistory() {
-            const btn = document.querySelector('.btn-sync');
-            const origText = btn.textContent;
-            btn.textContent = '⏳ Memproses Sync...';
-            btn.disabled = true;
+        // Load Periode Dropdown Options
+        async function loadPeriodeOptions() {
+            const select = document.getElementById('periodeSelect');
+            select.innerHTML = '<option value="">Memuat periode...</option>';
 
             try {
-                const res = await fetch(`${API_BASE}/api/rekap-tagihan-billing/sync-history`, {
-                    method: 'POST'
-                });
+                const res = await fetch(`${API_BASE}/api/rekap-tagihan-billing?billing_cycle=${currentMode}`);
                 const json = await res.json();
-                alert(json.message || 'Berhasil mengimpor riwayat pembayaran dari Google Sheets!');
-                fetchMonthlyData();
-            } catch (err) {
-                console.error('Error syncing history:', err);
-                alert('Gagal mengimpor riwayat pembayaran dari Google Sheets.');
-            } finally {
-                btn.textContent = origText;
-                btn.disabled = false;
-            }
-        }
 
-        // Initialize Page Data
-        async function initPage() {
-            switchMode('Weekly');
-        }
+                if (json.status === 'success' && json.periodes) {
+                    select.innerHTML = '';
+                    json.periodes.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p; opt.textContent = p;
+                        select.appendChild(opt);
+                    });
 
-        // Form Submit Handler
-        function handleFilterSubmit(e) {
-            e.preventDefault();
-            fetchMonthlyData();
-        }
-
-        // Fetch Monthly/Weekly Billing Data from Backend API
-        async function fetchMonthlyData() {
-            const cycle = document.getElementById('cycleSelect').value;
-            const tahun = document.getElementById('tahunSelect').value;
-            const bulan = document.getElementById('bulanSelect').value;
-            const minggu = document.getElementById('mingguSelect').value;
-            const status = document.getElementById('statusSelect').value;
-
-            let periode = '';
-            if (tahun && bulan) {
-                periode = `${tahun}-${bulan}`;
-                if (cycle === 'Weekly' && minggu) {
-                    periode += `-${minggu}`;
+                    if (json.periodes.length > 0) {
+                        select.value = json.periodes[0];
+                        await loadOwnerOptions();
+                        await loadBillingData();
+                    }
                 }
-            } else if (tahun) {
-                periode = `${tahun}`;
+            } catch (err) {
+                console.error('Error loading periodes:', err);
             }
+        }
 
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="14" class="state-container">
-                        <div class="spinner"></div>
-                        Mengambil data Tagihan (${cycle}) dari server database...
-                    </td>
-                </tr>
-            `;
-
-            let url = `${API_BASE}/api/rekap-tagihan-billing?billing_cycle=${encodeURIComponent(cycle)}&`;
-            const params = [];
-            if (periode) params.push(`periode=${encodeURIComponent(periode)}`);
-            if (status) params.push(`status_pembayaran=${encodeURIComponent(status)}`);
-            url += params.join('&');
+        // Load Owners Dropdown Options
+        async function loadOwnerOptions() {
+            const ownerSel = document.getElementById('ownerSelect');
+            ownerSel.innerHTML = '<option value="">Semua Owner</option>';
 
             try {
+                const res = await fetch(`${API_BASE}/api/rekap-tagihan/owners`);
+                const json = await res.json();
+
+                if (json.status === 'success' && json.owners) {
+                    json.owners.forEach(o => {
+                        const opt = document.createElement('option');
+                        opt.value = o; opt.textContent = o;
+                        ownerSel.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error('Error loading owners:', err);
+            }
+        }
+
+        // Load Billing Data
+        async function loadBillingData() {
+            const tbody = document.getElementById('billingTableBody');
+            tbody.innerHTML = `<tr><td colspan="10" class="loading-state"><div class="spinner"></div>Memuat data tagihan billing...</td></tr>`;
+
+            const periode = document.getElementById('periodeSelect').value;
+            const owner = document.getElementById('ownerSelect').value;
+
+            try {
+                const url = new URL(`${API_BASE}/api/rekap-tagihan-billing`);
+                url.searchParams.append('billing_cycle', currentMode);
+                if (periode) url.searchParams.append('periode', periode);
+                if (owner) url.searchParams.append('owner_name', owner);
+
                 const res = await fetch(url);
                 const json = await res.json();
 
-                if (!json.data || json.data.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="14" class="state-container">
-                                Tidak ada data tagihan yang sesuai dengan filter.
-                            </td>
-                        </tr>
-                    `;
-                    updateKPIs(0, 0, 0, 0, 0, 0);
-                    document.getElementById('recordCountBadge').textContent = '0 Outlet';
+                if (json.status !== 'success' || !json.data || json.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="loading-state">Tidak ada data tagihan untuk periode ini.</td></tr>`;
+                    updateKPIs(0, 0, 0, 0);
                     return;
                 }
 
-                rawMonthlyData = json.data;
-                renderTable(json.data);
+                currentData = json.data;
+                renderTable(currentData);
+
             } catch (err) {
-                console.error('Error fetching billing data:', err);
-                tbody.innerHTML = `
+                console.error('Error loading billing data:', err);
+                tbody.innerHTML = `<tr><td colspan="10" class="loading-state" style="color: #df1b41;">Gagal memuat data tagihan billing.</td></tr>`;
+            }
+        }
+
+        // Render Data Table
+        function renderTable(rows) {
+            const tbody = document.getElementById('billingTableBody');
+            let html = '';
+            let grossTot = 0, commTot = 0, netTot = 0, billTot = 0;
+
+            rows.forEach((r, i) => {
+                const statusClass = r.payment_status === 'Paid' ? 'badge-success' : (r.payment_status === 'Pending' ? 'badge-warning' : 'badge-danger');
+                
+                grossTot += Number(r.pendapatan_kotor || 0);
+                commTot += Number(r.potongan_ojol || 0);
+                netTot += Number(r.pendapatan_bersih || 0);
+                billTot += Number(r.tagihan_superfood || 0);
+
+                html += `
                     <tr>
-                        <td colspan="14" class="state-container" style="color: #ef4444;">
-                            Gagal mengambil data dari server. Silakan coba lagi.
+                        <td>${i + 1}</td>
+                        <td><strong>${r.owner_name}</strong></td>
+                        <td>${r.periode}</td>
+                        <td class="num-col">${formatIDR(r.pendapatan_kotor)}</td>
+                        <td class="num-col">${formatIDR(r.potongan_ojol)}</td>
+                        <td class="num-col">${formatIDR(rowNet(r))}</td>
+                        <td class="num-col">${r.revenue_share_pct}%</td>
+                        <td class="num-col" style="font-weight: 700; color: var(--accent-primary);">${formatIDR(r.tagihan_superfood)}</td>
+                        <td class="text-center"><span class="badge ${statusClass}">${r.payment_status || 'Unpaid'}</span></td>
+                        <td class="text-center">
+                            <button type="button" class="btn-submit" style="padding: 3px 8px; font-size: 0.75rem;" onclick="openEditModal(${r.id}, '${r.owner_name}', '${r.payment_status}', '${r.notes || ''}')">Edit</button>
                         </td>
                     </tr>
                 `;
-            }
-        }
-
-        // Realtime Client-Side Search Filter for High Performance
-        function handleTableSearch() {
-            const query = document.getElementById('tableSearchInput').value.toLowerCase().trim();
-            if (!query) {
-                renderTable(rawMonthlyData);
-                return;
-            }
-
-            const filtered = rawMonthlyData.filter(r => {
-                if (r.owner_name === 'Grand Total') return true;
-                return (r.outlet_name && r.outlet_name.toLowerCase().includes(query)) ||
-                       (r.nama_resto_final && r.nama_resto_final.toLowerCase().includes(query)) ||
-                       (r.brand && r.brand.toLowerCase().includes(query)) ||
-                       (r.store_id && r.store_id.toLowerCase().includes(query));
             });
 
+            // Add Grand Total Row
+            html += `
+                <tr class="row-grand-total">
+                    <td colspan="3"><strong>GRAND TOTAL</strong></td>
+                    <td class="num-col">${formatIDR(grossTot)}</td>
+                    <td class="num-col">${formatIDR(commTot)}</td>
+                    <td class="num-col">${formatIDR(netTot)}</td>
+                    <td class="num-col">-</td>
+                    <td class="num-col" style="color: var(--accent-primary);">${formatIDR(billTot)}</td>
+                    <td colspan="2"></td>
+                </tr>
+            `;
+
+            tbody.innerHTML = html;
+            updateKPIs(grossTot, commTot, netTot, billTot);
+        }
+
+        function rowNet(r) {
+            return r.pendapatan_bersih !== undefined ? r.pendapatan_bersih : (Number(r.pendapatan_kotor || 0) - Number(r.potongan_ojol || 0));
+        }
+
+        function updateKPIs(gross, comm, net, bill) {
+            document.getElementById('kpiGross').textContent = formatIDR(gross);
+            document.getElementById('kpiCommission').textContent = formatIDR(comm);
+            document.getElementById('kpiNet').textContent = formatIDR(net);
+            document.getElementById('kpiBill').textContent = formatIDR(bill);
+        }
+
+        function handleSearchInput(query) {
+            if (!query) {
+                renderTable(currentData);
+                return;
+            }
+            const q = query.toLowerCase();
+            const filtered = currentData.filter(r => r.owner_name.toLowerCase().includes(q));
             renderTable(filtered);
         }
 
-        // 1-Click Quick Status Toggle for Maximum Operational Efficiency
-        async function quickToggleStatus(storeId, periode, currentStatus) {
-            const newStatus = (currentStatus === 'LUNAS' || currentStatus === 'Paid' || currentStatus === 'SUDAH DIBAYAR') ? 'BELUM DIBAYAR' : 'LUNAS';
-            const record = rawMonthlyData.find(r => r.store_id === storeId && r.periode === periode);
-            if (!record) return;
-
-            record.status_pembayaran = newStatus;
-            renderTable(rawMonthlyData);
-
-            // Persist to DB in background
-            const payload = {
-                store_id: record.store_id,
-                periode: record.periode,
-                penyesuaian: parseFloat(record.penyesuaian) || 0,
-                tanggal_tagihan: record.tanggal_tagihan || document.getElementById('headerTanggalTagihan').value || null,
-                transfer_id: record.transfer_id || null,
-                tanggal_pembayaran: newStatus === 'LUNAS' ? (record.tanggal_pembayaran || new Date().toISOString().split('T')[0]) : null,
-                link_bukti: record.link_bukti || null,
-                status_pembayaran: newStatus
-            };
-
-            try {
-                await fetch(`${API_BASE}/api/rekap-tagihan-billing/update-payment`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            } catch (err) {
-                console.error('Error toggling status:', err);
-            }
+        function handleFilterSubmit(e) {
+            e.preventDefault();
+            loadBillingData();
         }
 
-        // Clean O(N) Table Renderer (Rules Section 2 & 3)
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
-            const defaultTglTagihan = document.getElementById('headerTanggalTagihan').value || '-';
-
-            let grandTotalRow = null;
-            let paidCount = 0;
-            let unpaidCount = 0;
-
-            const htmlRows = data.map((row) => {
-                const isGrandTotal = (row.owner_name === 'Grand Total');
-                if (isGrandTotal) {
-                    grandTotalRow = row;
-                    return `<tr class="row-grand-total">
-                        <td>Grand Total</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td class="text-center">${row.jumlah_order_sukses.toLocaleString('id-ID')}</td>
-                        <td class="text-right">-</td>
-                        <td class="text-right">${formatIDR(row.subtotal_tagihan)}</td>
-                        <td class="text-right">${formatIDR(row.penyesuaian)}</td>
-                        <td class="text-right">${formatIDR(row.total_tagihan)}</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td class="text-center">-</td>
-                        <td class="text-center">-</td>
-                    </tr>`;
-                }
-
-                const currentStatus = row.status_pembayaran || 'BELUM DIBAYAR';
-                const isLunas = (currentStatus === 'LUNAS' || currentStatus === 'SUDAH DIBAYAR' || currentStatus === 'Paid');
-                
-                if (isLunas) paidCount++;
-                else unpaidCount++;
-
-                const formattedBiaya = formatIDR(row.biaya);
-                const formattedSubtotal = formatIDR(row.subtotal_tagihan);
-                const formattedPenyesuaian = formatIDR(row.penyesuaian);
-                const formattedTotal = formatIDR(row.total_tagihan);
-                const formattedOrder = row.jumlah_order_sukses.toLocaleString('id-ID');
-
-                const tglTagihan = row.tanggal_tagihan || defaultTglTagihan;
-                const trfId = row.transfer_id || '-';
-                const tglBayar = row.tanggal_pembayaran || '-';
-                const linkBukti = row.link_bukti ? `<a href="${row.link_bukti}" target="_blank" style="color: var(--primary);">Lihat Bukti</a>` : '-';
-
-                const badgeClass = isLunas ? 'badge-status-lunas' : ((currentStatus === 'PENDING' || currentStatus === 'Pending') ? 'badge-status-pending' : 'badge-status-belum-dibayar');
-                const displayStatusLabel = isLunas ? 'LUNAS' : (currentStatus === 'PENDING' ? 'PENDING' : 'BELUM DIBAYAR');
-
-                // Interactive 1-click status badge toggle for high efficiency
-                const statusBadge = `<span class="${badgeClass}" title="Klik untuk ubah status cepat" onclick="quickToggleStatus('${row.store_id}', '${row.periode}', '${displayStatusLabel}')">${displayStatusLabel}</span>`;
-                const actionBtn = `<button class="btn-action" onclick="openEditModal('${row.store_id}', '${row.periode}')">Input / Edit</button>`;
-
-                return `<tr>
-                    <td>${row.outlet_name}</td>
-                    <td>${row.nama_resto_final}</td>
-                    <td>${row.periode}</td>
-                    <td class="text-center">${formattedOrder}</td>
-                    <td class="text-right">${formattedBiaya}</td>
-                    <td class="text-right">${formattedSubtotal}</td>
-                    <td class="text-right">${formattedPenyesuaian}</td>
-                    <td class="text-right" style="font-weight: 700;">${formattedTotal}</td>
-                    <td>${tglTagihan}</td>
-                    <td>${trfId}</td>
-                    <td>${tglBayar}</td>
-                    <td>${linkBukti}</td>
-                    <td class="text-center">${statusBadge}</td>
-                    <td class="text-center">${actionBtn}</td>
-                </tr>`;
-            }).join('');
-
-            tbody.innerHTML = htmlRows;
-
-            if (grandTotalRow) {
-                updateKPIs(
-                    grandTotalRow.subtotal_tagihan,
-                    grandTotalRow.penyesuaian,
-                    grandTotalRow.total_tagihan,
-                    grandTotalRow.jumlah_order_sukses,
-                    paidCount,
-                    unpaidCount
-                );
-            }
-
-            document.getElementById('recordCountBadge').textContent = `${data.length - 1} Outlet Periode`;
-        }
-
-        // Modal Functions
-        function openEditModal(storeId, periode) {
-            const record = rawMonthlyData.find(r => r.store_id === storeId && r.periode === periode);
-            if (!record) return;
-
-            document.getElementById('editStoreId').value = storeId;
-            document.getElementById('editPeriode').value = periode;
-            document.getElementById('displayStoreId').value = storeId;
-            document.getElementById('displayPeriode').value = periode;
-
-            document.getElementById('editPenyesuaian').value = record.penyesuaian || 0;
-            document.getElementById('editTanggalTagihan').value = record.tanggal_tagihan || document.getElementById('headerTanggalTagihan').value || '';
-            document.getElementById('editTransferId').value = record.transfer_id || '';
-            document.getElementById('editTanggalPembayaran').value = record.tanggal_pembayaran || '';
-            document.getElementById('editLinkBukti').value = record.link_bukti || '';
-            
-            const st = record.status_pembayaran || 'BELUM DIBAYAR';
-            const normSt = (st === 'LUNAS' || st === 'SUDAH DIBAYAR' || st === 'Paid') ? 'LUNAS' : (st === 'PENDING' ? 'PENDING' : 'BELUM DIBAYAR');
-            document.getElementById('editStatusPembayaran').value = normSt;
-
-            document.getElementById('editModal').classList.add('active');
+        function openEditModal(id, owner, status, notes) {
+            activeRecordId = id;
+            document.getElementById('modalOwnerText').textContent = `Owner: ${owner}`;
+            document.getElementById('modalStatusSelect').value = status || 'Unpaid';
+            document.getElementById('modalNotesInput').value = notes || '';
+            document.getElementById('editModal').style.display = 'flex';
         }
 
         function closeEditModal() {
-            document.getElementById('editModal').classList.remove('active');
+            document.getElementById('editModal').style.display = 'none';
         }
 
-        // Handle Save Administrative Payment Form
-        async function handleSavePayment(e) {
-            e.preventDefault();
+        async function savePaymentStatus() {
+            if (!activeRecordId) return;
 
-            const payload = {
-                store_id: document.getElementById('editStoreId').value,
-                periode: document.getElementById('editPeriode').value,
-                penyesuaian: parseFloat(document.getElementById('editPenyesuaian').value) || 0,
-                tanggal_tagihan: document.getElementById('editTanggalTagihan').value,
-                transfer_id: document.getElementById('editTransferId').value,
-                tanggal_pembayaran: document.getElementById('editTanggalPembayaran').value,
-                link_bukti: document.getElementById('editLinkBukti').value,
-                status_pembayaran: document.getElementById('editStatusPembayaran').value
-            };
+            const status = document.getElementById('modalStatusSelect').value;
+            const notes = document.getElementById('modalNotesInput').value;
 
             try {
-                const res = await fetch(`${API_BASE}/api/rekap-tagihan-billing/update-payment`, {
+                const res = await fetch(`${API_BASE}/api/rekap-tagihan-billing/${activeRecordId}/status`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ payment_status: status, notes: notes })
                 });
 
-                if (!res.ok) throw new Error('Failed to save payment record');
-
-                closeEditModal();
-                fetchMonthlyData();
+                const json = await res.json();
+                if (json.status === 'success') {
+                    closeEditModal();
+                    loadBillingData();
+                } else {
+                    alert('Gagal update status: ' + (json.detail || 'Error'));
+                }
             } catch (err) {
-                console.error('Error saving payment:', err);
+                console.error('Error saving payment status:', err);
             }
         }
 
-        // Update KPI Cards
-        function updateKPIs(subtotal, penyesuaian, total, sukses, paid, unpaid) {
-            document.getElementById('kpiSubtotal').textContent = formatIDR(subtotal);
-            document.getElementById('kpiTotal').textContent = formatIDR(total);
-            document.getElementById('kpiSukses').textContent = `${sukses.toLocaleString('id-ID')} Order`;
-            document.getElementById('kpiPaidStatus').textContent = `${paid} Lunas / ${unpaid} Belum Dibayar`;
-        }
-
-        window.addEventListener('DOMContentLoaded', initPage);
+        // Initial Load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPeriodeOptions();
+        });
     </script>
 </body>
 </html>

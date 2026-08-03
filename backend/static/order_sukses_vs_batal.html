@@ -3,301 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 Chart: All OFD + GrabFood & ShopeeFood - SuperFood Elevate</title>
-    <!-- Google Fonts: Outfit & Inter -->
+    <title>Order Sukses vs Batal - SuperFood Elevate</title>
+    <!-- Google Fonts: Inter with Tabular Nums -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <link rel="stylesheet" href="/static/style_enterprise.css">
     <style>
-        :root {
-            --bg-base: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --bg-card-border: rgba(255, 255, 255, 0.1);
-            --bg-input: rgba(15, 23, 42, 0.6);
-            --primary: #38bdf8;
-            --primary-hover: #0284c7;
-            --accent-green: #34d399;
-            --accent-rose: #fb7185;
-            --accent-amber: #fbbf24;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(192, 132, 252, 0.12) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 1.5rem;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
+        .pie-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
         }
-
-        /* Header Navigation */
-        header.dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.75rem;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .brand-section h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #38bdf8 0%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
-        }
-
-        .header-nav-links {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .nav-link-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 0.55rem 1.1rem;
-            border-radius: 0.6rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .nav-link-btn:hover, .nav-link-btn.active {
-            background: var(--primary);
-            color: #0f172a;
-            border-color: var(--primary);
-        }
-
-        /* Filter Card */
-        .filter-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.5rem;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.25rem;
-            align-items: end;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .form-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-control {
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.65rem 0.9rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-        }
-
-        select.form-control option {
-            background-color: #1e293b;
-            color: #f8fafc;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-            color: #0f172a;
-            border: none;
-            padding: 0.65rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.4);
-        }
-
-        /* 3 Charts Grid */
-        .charts-grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 1024px) {
-            .charts-grid-3 {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .chart-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            padding: 1.25rem 1.5rem;
-            box-shadow: var(--shadow-glow);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .chart-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
-        }
-
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 280px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Table Card */
-        .table-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--bg-card-border);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .table-header-bar {
-            padding: 1.1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(15, 23, 42, 0.4);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .table-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--accent-amber);
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table.data-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.88rem;
-        }
-
-        table.data-table th {
-            background-color: rgba(30, 41, 59, 0.9);
-            color: var(--text-muted);
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            padding: 0.9rem 1.25rem;
-            border-bottom: 2px solid var(--border-color);
-            white-space: nowrap;
-        }
-
-        table.data-table th.num-col, table.data-table td.num-col {
-            text-align: right;
-        }
-
-        table.data-table td {
-            padding: 0.8rem 1.25rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            white-space: nowrap;
-        }
-
-        table.data-table tr:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-
-        tr.row-all-ofd {
-            background-color: rgba(56, 189, 248, 0.12) !important;
-            font-weight: 800;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        tr.row-all-ofd td {
-            color: #ffffff;
-        }
-
-        .val-sukses { color: var(--accent-green); font-weight: 700; }
-        .val-batal { color: var(--accent-rose); font-weight: 700; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header Navigation -->
+        <!-- Header Navigation Bar -->
         <header class="dashboard-header">
             <div class="brand-section">
                 <h1>Order Sukses vs Order Batal</h1>
@@ -306,12 +30,14 @@
             <div class="header-nav-links">
                 <a href="/rekap-tagihan-billing" class="nav-link-btn">Rekap Tagihan Billing</a>
                 <a href="/rangkuman" class="nav-link-btn">Rangkuman</a>
+                <a href="/laporan-performa" class="nav-link-btn">Laporan Performa</a>
+                <a href="/performa-comparison" class="nav-link-btn">Performa Comparison</a>
                 <a href="/laporan-jam-ramai" class="nav-link-btn">Laporan Jam Ramai</a>
                 <a href="/order-sukses-vs-batal" class="nav-link-btn active">Order Sukses vs Batal</a>
             </div>
         </header>
 
-        <!-- Filter Form -->
+        <!-- Filter Controls Card -->
         <div class="filter-card">
             <form id="filterForm" onsubmit="handleFilterSubmit(event)">
                 <div class="filter-grid">
@@ -333,55 +59,55 @@
 
                     <!-- Filter Date Range: Dari -->
                     <div class="form-group">
-                        <label for="startDateInput" class="form-label">Dari</label>
+                        <label for="startDateInput" class="form-label">Dari Tanggal</label>
                         <input type="date" id="startDateInput" class="form-control" value="2026-04-01">
                     </div>
 
                     <!-- Filter Date Range: Hingga -->
                     <div class="form-group">
-                        <label for="endDateInput" class="form-label">Hingga</label>
+                        <label for="endDateInput" class="form-label">Hingga Tanggal</label>
                         <input type="date" id="endDateInput" class="form-control" value="2026-06-30">
                     </div>
 
                     <!-- Submit Button -->
                     <div class="form-group">
-                        <button type="submit" class="btn-submit">Tampilkan Laporan</button>
+                        <button type="submit" class="btn-submit">Tampilkan Status Order</button>
                     </div>
                 </div>
             </form>
         </div>
 
-        <!-- 3 Pie Charts Grid -->
-        <div class="charts-grid-3">
-            <!-- Chart 1: All OFD -->
+        <!-- 3 Pie/Donut Charts Grid: All OFD + GrabFood + ShopeeFood -->
+        <div class="pie-charts-grid">
+            <!-- 1. All OFD -->
             <div class="chart-card">
-                <h2 class="chart-title">Pie Chart: All OFD (Gabungan Channel)</h2>
-                <div class="chart-container">
-                    <canvas id="chartAllOFD"></canvas>
+                <h2 class="chart-title">Gabungan All OFD</h2>
+                <div class="chart-canvas-box" style="height: 300px;">
+                    <canvas id="chartPieAll"></canvas>
                 </div>
             </div>
 
-            <!-- Chart 2: GrabFood -->
+            <!-- 2. GrabFood -->
             <div class="chart-card">
-                <h2 class="chart-title">Pie Chart: GrabFood</h2>
-                <div class="chart-container">
-                    <canvas id="chartGrabFood"></canvas>
+                <h2 class="chart-title">GrabFood</h2>
+                <div class="chart-canvas-box" style="height: 300px;">
+                    <canvas id="chartPieGrab"></canvas>
                 </div>
             </div>
 
-            <!-- Chart 3: ShopeeFood -->
+            <!-- 3. ShopeeFood -->
             <div class="chart-card">
-                <h2 class="chart-title">Pie Chart: ShopeeFood</h2>
-                <div class="chart-container">
-                    <canvas id="chartShopeeFood"></canvas>
+                <h2 class="chart-title">ShopeeFood</h2>
+                <div class="chart-canvas-box" style="height: 300px;">
+                    <canvas id="chartPieShopee"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Rincian Status Table Card -->
+        <!-- Order Status Summary Table Card -->
         <div class="table-card">
             <div class="table-header-bar">
-                <h2 class="table-title">Rincian Perbandingan Status Per Channel</h2>
+                <h2 class="table-title">Rincian Perbandingan Order Sukses vs Batal</h2>
             </div>
             
             <div class="table-responsive">
@@ -389,16 +115,19 @@
                     <thead>
                         <tr>
                             <th>Channel</th>
-                            <th class="num-col">Total Transaksi</th>
+                            <th class="num-col">Total Order</th>
                             <th class="num-col">Order Sukses</th>
-                            <th class="num-col">% Sukses</th>
                             <th class="num-col">Order Batal</th>
-                            <th class="num-col">% Batal</th>
+                            <th class="num-col">% Order Sukses</th>
+                            <th class="num-col">% Order Batal</th>
                         </tr>
                     </thead>
                     <tbody id="statusTableBody">
                         <tr>
-                            <td colspan="6" class="loading-state">Memuat data status...</td>
+                            <td colspan="6" class="loading-state">
+                                <div class="spinner"></div>
+                                Memuat rincian status order...
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -409,7 +138,6 @@
     <script>
         const API_BASE = window.location.origin;
         const chartInstances = {};
-
         let filterMapping = [];
 
         // Initialize Filter Options & Cascading Handlers
@@ -466,26 +194,16 @@
         // Helper to render a Pie Chart
         function drawPieChart(canvasId, titleChannel, suk, bat, pctSuk, pctBat) {
             const ctx = document.getElementById(canvasId).getContext('2d');
-            if (chartInstances[canvasId]) {
-                chartInstances[canvasId].destroy();
-            }
-
-            const tot = suk + bat;
+            if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
 
             chartInstances[canvasId] = new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
-                    labels: [`Sukses (${pctSuk}%)`, `Batal (${pctBat}%)`],
+                    labels: [`Order Sukses (${pctSuk}%)`, `Order Batal (${pctBat}%)`],
                     datasets: [{
                         data: [suk, bat],
-                        backgroundColor: [
-                            'rgba(52, 211, 153, 0.85)',
-                            'rgba(251, 113, 133, 0.85)'
-                        ],
-                        borderColor: [
-                            '#34d399',
-                            '#fb7185'
-                        ],
+                        backgroundColor: ['rgba(20, 128, 74, 0.85)', 'rgba(223, 27, 65, 0.85)'],
+                        borderColor: ['#14804a', '#df1b41'],
                         borderWidth: 1.5
                     }]
                 },
@@ -493,30 +211,18 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#f8fafc',
-                                font: { family: 'Inter', size: 11, weight: 600 },
-                                padding: 15
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(ctx) {
-                                    const val = ctx.raw || 0;
-                                    const pct = tot > 0 ? ((val / tot) * 100).toFixed(2) : 0;
-                                    return ` ${ctx.label.split(' ')[0]}: ${val.toLocaleString('id-ID')} (${pct}%)`;
-                                }
-                            }
-                        }
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', size: 11, weight: 600 } } },
+                        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${Number(ctx.raw).toLocaleString('id-ID')} Order` } }
                     }
                 }
             });
         }
 
-        // Fetch & Render 3 Pie Charts + Table
-        async function renderOrderStatus(params) {
+        // Fetch & Render Status Data & Donut Charts
+        async function loadStatusData(params) {
+            const tbody = document.getElementById('statusTableBody');
+            tbody.innerHTML = `<tr><td colspan="6" class="loading-state"><div class="spinner"></div>Memuat rincian status order...</td></tr>`;
+
             try {
                 const url = new URL(`${API_BASE}/api/order-status/summary`);
                 Object.keys(params).forEach(k => { if (params[k]) url.searchParams.append(k, params[k]); });
@@ -524,50 +230,47 @@
                 const res = await fetch(url);
                 const json = await res.json();
 
-                if (json.status !== 'success' || !json.data || json.data.length === 0) return;
+                if (json.status !== 'success' || !json.data || json.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="loading-state">Tidak ada data untuk filter ini.</td></tr>`;
+                    return;
+                }
 
-                const tbody = document.getElementById('statusTableBody');
                 let html = '';
-
-                // Map channels to canvas IDs (Excluding GoFood)
-                const canvasMap = {
-                    'All OFD': 'chartAllOFD',
-                    'GrabFood': 'chartGrabFood',
-                    'ShopeeFood': 'chartShopeeFood'
-                };
-
                 json.data.forEach(row => {
-                    const isAll = row.channel === 'All OFD';
-                    const rowClass = isAll ? 'row-all-ofd' : '';
-                    const suk = Number(row.order_sukses || 0);
-                    const bat = Number(row.order_batal || 0);
-                    const pctSuk = Number(row.pct_sukses || 0).toFixed(2);
-                    const pctBat = Number(row.pct_batal || 0).toFixed(2);
+                    const isGrandTotal = row.channel === 'Grand Total';
+                    const rowClass = isGrandTotal ? 'row-grand-total' : '';
 
                     html += `
                         <tr class="${rowClass}">
                             <td><strong>${row.channel}</strong></td>
                             <td class="num-col">${Number(row.total_order).toLocaleString('id-ID')}</td>
-                            <td class="num-col val-sukses">${suk.toLocaleString('id-ID')}</td>
-                            <td class="num-col val-sukses">${pctSuk}%</td>
-                            <td class="num-col val-batal">${bat.toLocaleString('id-ID')}</td>
-                            <td class="num-col val-batal">${pctBat}%</td>
+                            <td class="num-col">${Number(row.order_sukses).toLocaleString('id-ID')}</td>
+                            <td class="num-col">${Number(row.order_batal).toLocaleString('id-ID')}</td>
+                            <td class="num-col"><span class="badge badge-success">${row.pct_sukses}%</span></td>
+                            <td class="num-col"><span class="badge badge-danger">${row.pct_batal}%</span></td>
                         </tr>
                     `;
-
-                    // Render chart if in map
-                    if (canvasMap[row.channel]) {
-                        drawPieChart(canvasMap[row.channel], row.channel, suk, bat, pctSuk, pctBat);
-                    }
                 });
 
                 tbody.innerHTML = html;
+
+                // Draw Donut Charts for All OFD, GrabFood, ShopeeFood
+                const rowAll = json.data.find(r => r.channel === 'Grand Total') || { order_sukses: 0, order_batal: 0, pct_sukses: 0, pct_batal: 0 };
+                drawPieChart('chartPieAll', 'All OFD', rowAll.order_sukses, rowAll.order_batal, rowAll.pct_sukses, rowAll.pct_batal);
+
+                const rowGrab = json.data.find(r => r.channel === 'GrabFood') || { order_sukses: 0, order_batal: 0, pct_sukses: 0, pct_batal: 0 };
+                drawPieChart('chartPieGrab', 'GrabFood', rowGrab.order_sukses, rowGrab.order_batal, rowGrab.pct_sukses, rowGrab.pct_batal);
+
+                const rowShopee = json.data.find(r => r.channel === 'ShopeeFood') || { order_sukses: 0, order_batal: 0, pct_sukses: 0, pct_batal: 0 };
+                drawPieChart('chartPieShopee', 'ShopeeFood', rowShopee.order_sukses, rowShopee.order_batal, rowShopee.pct_sukses, rowShopee.pct_batal);
+
             } catch (err) {
-                console.error('Error rendering order status:', err);
+                console.error('Error loading order status data:', err);
+                tbody.innerHTML = `<tr><td colspan="6" class="loading-state" style="color: #df1b41;">Gagal memuat rincian status order.</td></tr>`;
             }
         }
 
-        // Handle Filter Form Submit
+        // Handle Filter Submit
         function handleFilterSubmit(e) {
             e.preventDefault();
             const params = {
@@ -577,7 +280,7 @@
                 end_date: document.getElementById('endDateInput').value
             };
 
-            renderOrderStatus(params);
+            loadStatusData(params);
         }
 
         // Initial Load
@@ -591,7 +294,7 @@
                 end_date: '2026-06-30'
             };
 
-            renderOrderStatus(initialParams);
+            loadStatusData(initialParams);
         });
     </script>
 </body>

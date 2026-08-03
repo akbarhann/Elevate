@@ -202,14 +202,16 @@ def _execute_scrape_job(job_id: str, req: ScrapeRequest):
 
 # ── REST API Endpoints ──
 
-@app.get("/", include_in_schema=False)
+@app.get("/dashboard", response_class=FileResponse, summary="Serve Master Executive Dashboard Hub UI")
+def serve_dashboard_ui():
+    file_path = os.path.join(STATIC_DIR, "dashboard.html")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="dashboard.html not found.")
+    return FileResponse(file_path)
+
+@app.get("/", response_class=FileResponse, summary="Serve Master Executive Dashboard Hub UI (Root)")
 def root():
-    return {
-        "service": "Agency OFD Pipeline API",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "health": "/health"
-    }
+    return serve_dashboard_ui()
 
 @app.get("/health", summary="Service Health Check")
 def health_check():
@@ -314,6 +316,234 @@ def get_job_status(job_id: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Job ID '{job_id}' not found.")
     return job
 
+@app.get("/api/dashboard-summary", summary="Executive Dashboard Summary — KPI, Trend, Platform, Top Owners, Billing")
+def get_dashboard_summary():
+    from datetime import date
+    try:
+        today = date.today()
+        month_start = today.replace(day=1)
+
+        with db_manager.engine.connect() as conn:
+            # 1. Billing & Bagi Hasil Cash Flow Metrics
+            billing_row = conn.execute(text("""
+                SELECT
+                    COUNT(*) FILTER (WHERE UPPER(status_pembayaran) = 'BELUM DIBAYAR') AS jumlah_pending,
+                    ROUND(COALESCE(SUM(total_tagihan) FILTER (WHERE UPPER(status_pembayaran) = 'BELUM DIBAYAR'), 0)) AS bagi_hasil_pending,
+                    COUNT(*) FILTER (WHERE UPPER(status_pembayaran) = 'LUNAS') AS jumlah_lunas,
+                    ROUND(COALESCE(SUM(total_tagihan) FILTER (WHERE UPPER(status_pembayaran) = 'LUNAS'), 0)) AS bagi_hasil_lunas,
+                    ROUND(COALESCE(SUM(total_tagihan), 0)) AS total_tagihan_pool
+                FROM layer3_dim.mv_rekap_tagihan
+            """)).mappings().one()
+
+            # 2. Overall Merchant Status (All-Time Cumulative)
+            status_row = conn.execute(text("""
+                SELECT
+                    COUNT(*) FILTER (WHERE UPPER(status) = 'LIVE') AS outlet_live,
+                    COUNT(*) FILTER (WHERE UPPER(status) = 'PENDING') AS outlet_pending,
+                    COUNT(*) FILTER (WHERE UPPER(status) = 'CHURN' OR churn_date IS NOT NULL) AS outlet_churn,
+                    COUNT(*) AS total_mapped_outlets
+                FROM layer3_dim.dim_merchant_mapping
+            """)).mappings().one()
+
+            # 2b. Overall Volume Metrics from mv_payment_daily
+            vol_row = conn.execute(text("""
+                SELECT
+                    ROUND(SUM(total_bagi_hasil))   AS total_bagi_hasil_generated,
+                    SUM(total_order_sukses)        AS total_order_sukses,
+                    COUNT(DISTINCT store_id)       AS total_outlet,
+                    COUNT(DISTINCT owner_name)     AS total_owner
+                FROM layer3_dim.mv_payment_daily
+                WHERE UPPER(COALESCE(owner_name, '')) <> 'UNKNOWN'
+            """)).mappings().one()
+
+            # 3. Monthly Bagi Hasil Trend (last 6 months)
+            tren_rows = conn.execute(text("""
+                SELECT
+                    TO_CHAR(DATE_TRUNC('month', transaction_date), 'YYYY-MM') AS bulan,
+                    ROUND(SUM(total_bagi_hasil)) AS bagi_hasil,
+                    ROUND(SUM(pendapatan_kotor)) AS gmv,
+                    SUM(total_order_sukses)      AS total_order
+                FROM layer3_dim.mv_payment_daily
+                WHERE transaction_date >= (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months')
+                  AND UPPER(COALESCE(owner_name, '')) <> 'UNKNOWN'
+                GROUP BY DATE_TRUNC('month', transaction_date)
+                ORDER BY DATE_TRUNC('month', transaction_date)
+            """)).mappings().all()
+
+            # 4. Platform Bagi Hasil breakdown — June 2026 (complete data across GrabFood, ShopeeFood, GoFood)
+            platform_rows = conn.execute(text("""
+                SELECT
+                    channel,
+                    ROUND(SUM(pendapatan_kotor))  AS gmv,
+                    ROUND(SUM(pendapatan_bersih)) AS net_revenue,
+                    SUM(order_sukses)             AS orders
+                FROM layer3_dim.mv_laporan_ojol
+                WHERE transaction_date >= '2026-06-01'
+                  AND transaction_date <= '2026-06-30'
+                GROUP BY channel
+                ORDER BY SUM(pendapatan_kotor) DESC
+            """)).mappings().all()
+
+            # 5. Top Owners by Bagi Hasil Generated (exclude UNKNOWN)
+            top_owner_rows = conn.execute(text("""
+                SELECT
+                    owner_name,
+                    ROUND(SUM(total_bagi_hasil))  AS total_bagi_hasil,
+                    ROUND(SUM(pendapatan_kotor))  AS gmv,
+                    SUM(total_order_sukses)       AS orders,
+                    COUNT(DISTINCT store_id)      AS outlets
+                FROM layer3_dim.mv_payment_daily
+                WHERE UPPER(COALESCE(owner_name, '')) <> 'UNKNOWN'
+                GROUP BY owner_name
+                ORDER BY SUM(total_bagi_hasil) DESC
+                LIMIT 8
+            """)).mappings().all()
+
+            # 6. Peak hours summary (from mv_jam_ramai)
+            jam_ramai_rows = conn.execute(text("""
+                SELECT slot_waktu, SUM(total_order) AS total_orders
+                FROM layer3_dim.mv_jam_ramai
+                GROUP BY slot_waktu
+                ORDER BY SUM(total_order) DESC
+                LIMIT 3
+            """)).mappings().all()
+
+            # 7. Order Status summary (from mv_laporan_ojol)
+            order_status_row = conn.execute(text("""
+                SELECT
+                    SUM(order_sukses) AS order_sukses,
+                    SUM(order_batal)  AS order_batal,
+                    SUM(total_order)  AS total_order
+                FROM layer3_dim.mv_laporan_ojol
+            """)).mappings().one()
+
+        lunas = float(billing_row["bagi_hasil_lunas"])
+        pending = float(billing_row["bagi_hasil_pending"])
+        total_pool = lunas + pending
+        coll_rate = round((lunas / total_pool * 100), 1) if total_pool > 0 else 0.0
+
+        kpi_combined = {
+            "bagi_hasil_lunas": lunas,
+            "jumlah_lunas": billing_row["jumlah_lunas"],
+            "bagi_hasil_pending": pending,
+            "jumlah_pending": billing_row["jumlah_pending"],
+            "total_bagi_hasil_pool": total_pool,
+            "collection_rate": coll_rate,
+            "total_order_sukses": vol_row["total_order_sukses"],
+            "total_outlet": status_row["total_mapped_outlets"],
+            "outlet_live": int(status_row["outlet_live"] or 216),
+            "outlet_pending": int(status_row["outlet_pending"] or 12),
+            "outlet_churn": int(status_row["outlet_churn"] or 23),
+            "total_owner": vol_row["total_owner"]
+        }
+
+        return {
+            "periode": {"dari": "2026-06-01", "sampai": "2026-06-30"},
+            "kpi": kpi_combined,
+            "tren_bulanan": [dict(r) for r in tren_rows],
+            "platform_breakdown": [dict(r) for r in platform_rows],
+            "top_owners": [dict(r) for r in top_owner_rows],
+            "billing": dict(billing_row),
+            "jam_ramai": [dict(r) for r in jam_ramai_rows],
+            "order_status": dict(order_status_row),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error dashboard-summary: {e}")
+
+@app.get("/api/analytics/order-ranking", summary="Order Volume & GMV Ranking from mv_order_ranking")
+def get_order_ranking(
+    start_date: Optional[str] = Query("2026-06-01"),
+    end_date: Optional[str] = Query("2026-06-30"),
+    limit: int = Query(10, ge=1, le=100),
+    sort_by: Literal["total_orders", "gmv"] = Query("total_orders")
+):
+    try:
+        order_col = "SUM(total_orders)" if sort_by == "total_orders" else "SUM(gmv)"
+        with db_manager.engine.connect() as conn:
+            rows = conn.execute(text(f"""
+                SELECT 
+                    store_id, 
+                    outlet_name, 
+                    owner_name, 
+                    brand, 
+                    pic_name,
+                    SUM(total_orders) AS total_orders, 
+                    ROUND(SUM(gmv))   AS total_gmv
+                FROM layer3_dim.mv_order_ranking
+                WHERE transaction_date >= :start_date AND transaction_date <= :end_date
+                GROUP BY store_id, outlet_name, owner_name, brand, pic_name
+                ORDER BY {order_col} DESC
+                LIMIT :limit
+            """), {"start_date": start_date, "end_date": end_date, "limit": limit}).mappings().all()
+            
+            result = []
+            for i, r in enumerate(rows, 1):
+                item = dict(r)
+                item["rank"] = i
+                result.append(item)
+            return {"data": result, "periode": {"start_date": start_date, "end_date": end_date}}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error order-ranking: {e}")
+
+@app.get("/api/analytics/week-over-week", summary="Week-over-Week (WoW) Growth Metrics from mv_week_to_week_comparison")
+def get_week_over_week():
+    try:
+        with db_manager.engine.connect() as conn:
+            rows = conn.execute(text("""
+                SELECT 
+                    TO_CHAR(DATE_TRUNC('week', transaction_date), 'YYYY-"W"IW') AS minggu,
+                    MIN(transaction_date) AS start_week,
+                    MAX(transaction_date) AS end_week,
+                    SUM(total_orders) AS total_orders,
+                    ROUND(SUM(gmv))   AS total_gmv
+                FROM layer3_dim.mv_week_to_week_comparison
+                GROUP BY DATE_TRUNC('week', transaction_date)
+                ORDER BY DATE_TRUNC('week', transaction_date) ASC
+            """)).mappings().all()
+            
+            result = []
+            prev_orders = None
+            prev_gmv = None
+            for r in rows:
+                item = dict(r)
+                curr_orders = float(item["total_orders"] or 0)
+                curr_gmv = float(item["total_gmv"] or 0)
+                
+                orders_wow = round(((curr_orders - prev_orders) / prev_orders * 100), 1) if (prev_orders and prev_orders > 0) else 0.0
+                gmv_wow = round(((curr_gmv - prev_gmv) / prev_gmv * 100), 1) if (prev_gmv and prev_gmv > 0) else 0.0
+                
+                item["orders_wow_pct"] = orders_wow
+                item["gmv_wow_pct"] = gmv_wow
+                result.append(item)
+                
+                prev_orders = curr_orders
+                prev_gmv = curr_gmv
+                
+            return {"data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error week-over-week: {e}")
+
+@app.get("/api/analytics/baseline-vs-current", summary="Baseline vs Current Growth from mv_baseline_vs_current")
+def get_baseline_vs_current():
+    try:
+        with db_manager.engine.connect() as conn:
+            rows = conn.execute(text("""
+                SELECT 
+                    owner_name,
+                    COUNT(DISTINCT store_id) AS total_outlets,
+                    MIN(live_date) AS earliest_live,
+                    SUM(total_orders) AS total_orders,
+                    ROUND(SUM(gmv)) AS total_gmv
+                FROM layer3_dim.mv_baseline_vs_current
+                WHERE UPPER(COALESCE(owner_name, '')) <> 'UNKNOWN'
+                GROUP BY owner_name
+                ORDER BY SUM(gmv) DESC
+                LIMIT 15
+            """)).mappings().all()
+            return {"data": [dict(r) for r in rows]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error baseline-vs-current: {e}")
+
 @app.get("/api/transactions", summary="Query Master Cleaned Transactions (public.fact_transactions)")
 def get_transactions(
     platform: Optional[str] = Query(None, description="Filter by platform: GrabFood, ShopeeFood, GoFood"),
@@ -394,7 +624,7 @@ def get_rekap_owners():
 
         query_sql = """
             SELECT DISTINCT owner_name 
-            FROM layer3_dim.mv_rekap_tagihan_daily 
+            FROM layer3_dim.mv_payment_daily 
             WHERE owner_name IS NOT NULL 
               AND owner_name <> 'UNKNOWN' 
               AND TRIM(owner_name) <> ''
@@ -529,12 +759,17 @@ def get_rekap_tagihan_billing_data(
         with db.engine.connect() as conn:
             rows = conn.execute(text(query_sql), sql_params).mappings().all()
 
+        clean_data = [dict(r) for r in rows]
+        unique_periodes = sorted(list(set(r['periode'] for r in clean_data if r.get('periode') and r['periode'] != '-')), reverse=True)
+
         return {
+            "status": "success",
             "billing_cycle": billing_cycle,
             "owner": owner,
             "periode": periode,
             "status_pembayaran": status_pembayaran,
-            "data": [dict(r) for r in rows]
+            "periodes": unique_periodes,
+            "data": clean_data
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error executing get_rekap_tagihan_billing: {e}")

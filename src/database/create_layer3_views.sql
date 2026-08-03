@@ -123,7 +123,7 @@ BEGIN
                     ELSE mv.total_bagi_hasil
                 END
             ) AS bh
-        FROM layer3_dim.mv_rekap_tagihan_daily mv
+        FROM layer3_dim.mv_payment_daily mv
         WHERE (p_owner IS NULL OR p_owner = '' OR LOWER(mv.owner_name) = LOWER(p_owner))
           AND mv.transaction_date >= p_start_date
           AND mv.transaction_date <= p_end_date
@@ -415,7 +415,7 @@ BEGIN
                     WHEN g.p_code LIKE '%-W1' OR g.p_code LIKE '% W1' THEN (SUBSTRING(g.p_code FROM 1 FOR 7) || '-08')::DATE
                     WHEN g.p_code LIKE '%-W2' OR g.p_code LIKE '% W2' THEN (SUBSTRING(g.p_code FROM 1 FOR 7) || '-15')::DATE
                     WHEN g.p_code LIKE '%-W3' OR g.p_code LIKE '% W3' THEN (SUBSTRING(g.p_code FROM 1 FOR 7) || '-22')::DATE
-                    WHEN g.p_code LIKE '%-W4' OR g.p_code LIKE '% W4' THEN (SUBSTRING(g.p_code FROM 1 FOR 7) || '-29')::DATE
+                    WHEN g.p_code LIKE '%-W4' OR g.p_code LIKE '% W4' THEN ((SUBSTRING(g.p_code FROM 1 FOR 7) || '-01')::DATE + INTERVAL '27 days')::DATE
                     WHEN g.p_code LIKE '%-W5' OR g.p_code LIKE '% W5' THEN ((SUBSTRING(g.p_code FROM 1 FOR 7) || '-01')::DATE + INTERVAL '1 month' + INTERVAL '5 days')::DATE
                     ELSE ((SUBSTRING(g.p_code FROM 1 FOR 7) || '-01')::DATE + INTERVAL '1 month')::DATE
                 END
@@ -1178,36 +1178,38 @@ $$ LANGUAGE plpgsql;
 -- ============================================================================
 DROP MATERIALIZED VIEW IF EXISTS layer3_dim.mv_order_status CASCADE;
 
-CREATE MATERIALIZED VIEW layer3_dim.mv_order_status AS
+-- ============================================================================
+-- 12. VIEW ORDER STATUS (OPTIMIZED STANDARD VIEW FROM MV_LAPORAN_OJOL)
+-- ============================================================================
+DROP MATERIALIZED VIEW IF EXISTS layer3_dim.mv_order_status CASCADE;
+DROP VIEW IF EXISTS layer3_dim.v_order_status CASCADE;
+DROP VIEW IF EXISTS layer3_dim.mv_order_status CASCADE;
+
+CREATE OR REPLACE VIEW layer3_dim.v_order_status AS
 SELECT 
-    COALESCE(c.owner_name, m.owner_name, 'UNKNOWN') AS owner_name,
-    COALESCE(m.outlet_name, c.merchant_name, ft.outlet_name, 'UNKNOWN') AS outlet_name,
-    COALESCE(m.brand, 'UNKNOWN') AS brand,
-    ft.merchant_id AS store_id,
-    ft.transaction_date,
-    ft.platform AS channel,
-    COUNT(*)::BIGINT AS total_order,
-    COUNT(CASE WHEN ft.is_success = 1 THEN 1 END)::BIGINT AS order_sukses,
-    COUNT(CASE WHEN ft.is_cancelled = 1 OR ft.is_success = 0 THEN 1 END)::BIGINT AS order_batal,
-    SUM(CASE WHEN ft.is_success = 1 THEN ft.net_sales ELSE 0.00 END) AS pendapatan_kotor,
-    SUM(CASE WHEN ft.is_success = 1 THEN ft.revenue ELSE 0.00 END) AS pendapatan_bersih
-FROM layer3_dim.fact_transactions ft
-LEFT JOIN layer3_dim.dim_merchant_credentials c ON ft.merchant_id = c.store_id
-LEFT JOIN layer3_dim.dim_merchant_mapping m ON ft.merchant_id = m.store_id
-WHERE UPPER(COALESCE(m.status, 'LIVE')) = 'LIVE'
+    mv.owner_name,
+    mv.outlet_name,
+    mv.brand,
+    mv.store_id,
+    mv.transaction_date,
+    mv.channel,
+    SUM(mv.total_order)::BIGINT AS total_order,
+    SUM(mv.order_sukses)::BIGINT AS order_sukses,
+    SUM(mv.order_batal)::BIGINT AS order_batal,
+    SUM(mv.pendapatan_kotor) AS pendapatan_kotor,
+    SUM(mv.pendapatan_bersih) AS pendapatan_bersih
+FROM layer3_dim.mv_laporan_ojol mv
 GROUP BY 
-    COALESCE(c.owner_name, m.owner_name, 'UNKNOWN'),
-    COALESCE(m.outlet_name, c.merchant_name, ft.outlet_name, 'UNKNOWN'),
-    COALESCE(m.brand, 'UNKNOWN'),
-    ft.merchant_id,
-    ft.transaction_date,
-    ft.platform;
+    mv.owner_name,
+    mv.outlet_name,
+    mv.brand,
+    mv.store_id,
+    mv.transaction_date,
+    mv.channel;
 
-DROP INDEX IF EXISTS layer3_dim.idx_mv_order_status;
-DROP INDEX IF EXISTS layer3_dim.idx_mv_order_status_outlet;
-
-CREATE UNIQUE INDEX idx_mv_order_status ON layer3_dim.mv_order_status (store_id, transaction_date, channel);
-CREATE INDEX idx_mv_order_status_outlet ON layer3_dim.mv_order_status (outlet_name);
+-- Backward compatibility view alias
+CREATE OR REPLACE VIEW layer3_dim.mv_order_status AS 
+SELECT * FROM layer3_dim.v_order_status;
 
 -- ============================================================================
 -- 12. STORED FUNCTION GET LAPORAN ORDER STATUS
@@ -1348,37 +1350,36 @@ $$ LANGUAGE plpgsql;
 -- ============================================================================
 -- 13. MATERIALIZED VIEW PERFORMA COMPARISON
 -- ============================================================================
+-- 14. VIEW PERFORMA COMPARISON (OPTIMIZED STANDARD VIEW FROM MV_LAPORAN_OJOL)
+-- ============================================================================
 DROP MATERIALIZED VIEW IF EXISTS layer3_dim.mv_performa_comparison CASCADE;
+DROP VIEW IF EXISTS layer3_dim.v_performa_comparison CASCADE;
+DROP VIEW IF EXISTS layer3_dim.mv_performa_comparison CASCADE;
 
-CREATE MATERIALIZED VIEW layer3_dim.mv_performa_comparison AS
+CREATE OR REPLACE VIEW layer3_dim.v_performa_comparison AS
 SELECT 
-    COALESCE(c.owner_name, m.owner_name, 'UNKNOWN') AS owner_name,
-    COALESCE(m.outlet_name, c.merchant_name, ft.outlet_name, 'UNKNOWN') AS outlet_name,
-    COALESCE(m.brand, 'UNKNOWN') AS brand,
-    ft.merchant_id AS store_id,
-    ft.transaction_date,
-    SUM(CASE WHEN ft.is_success = 1 THEN ft.net_sales ELSE 0.00 END) AS pendapatan_kotor,
-    SUM(CASE WHEN ft.is_success = 1 THEN ft.ofd_fees ELSE 0.00 END) AS potongan_ojol,
-    SUM(CASE WHEN ft.is_success = 1 THEN ft.revenue ELSE 0.00 END) AS pendapatan_bersih,
-    COUNT(*)::BIGINT AS total_order,
-    COUNT(CASE WHEN ft.is_success = 1 THEN 1 END)::BIGINT AS order_sukses,
-    COUNT(CASE WHEN ft.is_cancelled = 1 OR ft.is_success = 0 THEN 1 END)::BIGINT AS order_batal
-FROM layer3_dim.fact_transactions ft
-LEFT JOIN layer3_dim.dim_merchant_credentials c ON ft.merchant_id = c.store_id
-LEFT JOIN layer3_dim.dim_merchant_mapping m ON ft.merchant_id = m.store_id
-WHERE UPPER(COALESCE(m.status, 'LIVE')) = 'LIVE'
+    mv.owner_name,
+    mv.outlet_name,
+    mv.brand,
+    mv.store_id,
+    mv.transaction_date,
+    SUM(mv.pendapatan_kotor) AS pendapatan_kotor,
+    SUM(mv.potongan_ojol) AS potongan_ojol,
+    SUM(mv.pendapatan_bersih) AS pendapatan_bersih,
+    SUM(mv.total_order)::BIGINT AS total_order,
+    SUM(mv.order_sukses)::BIGINT AS order_sukses,
+    SUM(mv.order_batal)::BIGINT AS order_batal
+FROM layer3_dim.mv_laporan_ojol mv
 GROUP BY 
-    COALESCE(c.owner_name, m.owner_name, 'UNKNOWN'),
-    COALESCE(m.outlet_name, c.merchant_name, ft.outlet_name, 'UNKNOWN'),
-    COALESCE(m.brand, 'UNKNOWN'),
-    ft.merchant_id,
-    ft.transaction_date;
+    mv.owner_name,
+    mv.outlet_name,
+    mv.brand,
+    mv.store_id,
+    mv.transaction_date;
 
-DROP INDEX IF EXISTS layer3_dim.idx_mv_performa_comp;
-DROP INDEX IF EXISTS layer3_dim.idx_mv_performa_comp_outlet;
-
-CREATE UNIQUE INDEX idx_mv_performa_comp ON layer3_dim.mv_performa_comparison (store_id, transaction_date);
-CREATE INDEX idx_mv_performa_comp_outlet ON layer3_dim.mv_performa_comparison (outlet_name);
+-- Backward compatibility view alias
+CREATE OR REPLACE VIEW layer3_dim.mv_performa_comparison AS 
+SELECT * FROM layer3_dim.v_performa_comparison;
 
 -- ============================================================================
 -- 14. STORED FUNCTION GET LAPORAN PERFORMA COMPARISON
